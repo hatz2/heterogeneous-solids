@@ -1,0 +1,12 @@
+# This file is managed by Conan, contents will be overwritten.
+# To keep your changes, remove these comment lines, but the plugin won't be able to modify your requirements
+
+requirements:
+  - "lodepng/cci.20230410"
+  - "glm/cci.20230113"
+  - "imgui/1.89.9-docking"
+  - "glfw/3.3.8"
+  - "glew/2.2.0"
+  - "nlohmann_json/3.11.3"
+  - "spdlog/1.13.0"
+  - "assimp/5.2.2"

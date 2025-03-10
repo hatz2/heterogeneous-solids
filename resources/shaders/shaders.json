@@ -1,0 +1,23 @@
+{
+  "surface": [
+    "surface.vert", "surface.frag", "lights.frag", "perlin.frag", "materials.frag"
+  ],
+  "line": [
+    "line.vert", "frag_color.frag"
+  ],
+  "vertex": [
+    "vertex.vert", "frag_color.frag"
+  ],
+  "grid_gizmo": [
+    "grid_gizmo.vert", "grid_gizmo.frag"
+  ],
+  "surface_select": [
+    "plain_color.vert", "plain_color.frag"
+  ],
+  "vertex_select": [
+    "vertex.vert", "plain_color.frag"
+  ],
+  "light_gizmo": [
+    "light_gizmo.vert", "frag_color.frag"
+  ]
+}

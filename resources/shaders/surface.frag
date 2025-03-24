@@ -12,6 +12,8 @@ uniform struct Material {
     vec3 kS;
 
     float shininess;
+    float roughness;
+    float metallic;
 } materials[2];
 
 layout (location = 0) out vec4 fragColor;

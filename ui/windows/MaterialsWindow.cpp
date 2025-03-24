@@ -189,8 +189,16 @@ namespace hs {
             material.setKS(ks);
 
         float shininess = material.getShininess();
-        if (ImGui::DragFloat("Shininess", &shininess, 0.5, 1, 0, "%.1f", ImGuiSliderFlags_AlwaysClamp))
+        if (ImGui::DragFloat("Shininess", &shininess, 0.1, 0, 128, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             material.setShininess(shininess);
+
+        float roughness = material.getRoughness();
+        if (ImGui::DragFloat("Roughness", &roughness, 0.01, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+            material.setRoughness(roughness);
+
+        float metallic = material.getMetallic();
+        if (ImGui::DragFloat("Metallic", &metallic, 0.01, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+            material.setMetallic(metallic);
     }
 
     void MaterialsWindow::pickMaterial(MaterialEditor& materialEditor, HeterogeneousMaterial& hsMaterial, bool primary) {

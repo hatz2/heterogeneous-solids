@@ -8,6 +8,13 @@ uniform struct Light {
     float spotAngle;
 } light;
 
+uniform bool usePbr;
+
+vec3 defaultPointLight(Material material);
+vec3 defaultDirectionalLight(Material material);
+vec3 defaultSpotLight(Material material);
+
+
 subroutine(LightMethod)
 vec3 ambientLight(Material material) {
     return light.iA * material.kA;
@@ -15,6 +22,14 @@ vec3 ambientLight(Material material) {
 
 subroutine(LightMethod)
 vec3 pointLight(Material material) {
+    if (usePbr) {
+        return pbrPointLight(material);
+    }
+    
+    return defaultPointLight(material);
+}
+
+vec3 defaultPointLight(Material material) {
     vec3 n = normalize(normal);
 
     vec3 l = normalize(light.position - position);
@@ -29,6 +44,14 @@ vec3 pointLight(Material material) {
 
 subroutine(LightMethod)
 vec3 directionalLight(Material material) {
+    if (usePbr) {
+        return pbrDirectionalLight(material);
+    }
+
+    return defaultDirectionalLight(material);
+}
+
+vec3 defaultDirectionalLight(Material material) {
     vec3 n = normalize(normal);
 
     vec3 l = normalize(-light.direction);
@@ -43,6 +66,14 @@ vec3 directionalLight(Material material) {
 
 subroutine(LightMethod)
 vec3 spotLight(Material material) {
+    if (usePbr) {
+        return pbrSpotLight(material);
+    }
+
+    return defaultSpotLight(material);
+}
+
+vec3 defaultSpotLight(Material material) {
     vec3 n = normalize(normal);
 
     vec3 l = normalize(light.position - position);

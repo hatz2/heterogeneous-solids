@@ -181,6 +181,7 @@ namespace hs {
 
         renderContext.setRenderMode(RenderMode::Surfaces);
         renderContext.setDetailedRendering(profile.isDetailedSurfaces());
+        renderContext.getUniform("usePbr").set(profile.isUsePbr());
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         auto it = scene.getLights().begin();

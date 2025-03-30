@@ -34,7 +34,9 @@ namespace hs {
         showGridGizmo(true),
         showLightsGizmo(false),
 
-        antialiasing(true)
+        antialiasing(true),
+
+        usePbr(false)
     {
 
     }
@@ -205,5 +207,15 @@ namespace hs {
 
     void RenderProfile::setAntialiasing(bool antialiasing) {
         RenderProfile::antialiasing = antialiasing;
+    }
+
+    bool RenderProfile::isUsePbr() const
+    {
+        return usePbr;
+    }
+
+    void RenderProfile::setUsePbr(bool usePbr)
+    {
+        this->usePbr = usePbr;
     }
 } // hs

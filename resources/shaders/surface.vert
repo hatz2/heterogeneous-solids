@@ -19,5 +19,5 @@ void main() {
     normal = vec3(mvMatrix * vec4(vNormal, 0.0));
     uvw = vUVW;
 
-    gl_Position = projectionMatrix * mvMatrix * vec4(vPosition, 1.0);
+    gl_Position = projectionMatrix * vec4(position, 1.0);
 }

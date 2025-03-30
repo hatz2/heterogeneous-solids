@@ -36,7 +36,7 @@ namespace hs {
 
         antialiasing(true),
 
-        usePbr(false)
+        usePbr(true)
     {
 
     }

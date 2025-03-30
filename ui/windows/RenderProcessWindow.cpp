@@ -101,7 +101,7 @@ namespace hs {
             if (ImGui::Checkbox("Show lights", &showLights))
                 profile.setShowLightsGizmo(showLights);
         }
-        if (ImGui::CollapsingHeader("PBR"), ImGuiTreeNodeFlags_DefaultOpen)
+        if (ImGui::CollapsingHeader("PBR", ImGuiTreeNodeFlags_DefaultOpen))
         {
             bool usePbr = profile.isUsePbr();
             if (ImGui::Checkbox("Use PBR", &usePbr))

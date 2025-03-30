@@ -20,6 +20,7 @@ vec3 ambientLight(Material material) {
     return light.iA * material.kA;
 }
 
+
 subroutine(LightMethod)
 vec3 pointLight(Material material) {
     if (usePbr) {
@@ -28,6 +29,27 @@ vec3 pointLight(Material material) {
     
     return defaultPointLight(material);
 }
+
+
+subroutine(LightMethod)
+vec3 directionalLight(Material material) {
+    if (usePbr) {
+        return pbrDirectionalLight(material);
+    }
+
+    return defaultDirectionalLight(material);
+}
+
+
+subroutine(LightMethod)
+vec3 spotLight(Material material) {
+    if (usePbr) {
+        return pbrSpotLight(material);
+    }
+
+    return defaultSpotLight(material);
+}
+
 
 vec3 defaultPointLight(Material material) {
     vec3 n = normalize(normal);
@@ -42,14 +64,6 @@ vec3 defaultPointLight(Material material) {
     return diffuse + specular;
 }
 
-subroutine(LightMethod)
-vec3 directionalLight(Material material) {
-    if (usePbr) {
-        return pbrDirectionalLight(material);
-    }
-
-    return defaultDirectionalLight(material);
-}
 
 vec3 defaultDirectionalLight(Material material) {
     vec3 n = normalize(normal);
@@ -64,14 +78,6 @@ vec3 defaultDirectionalLight(Material material) {
     return diffuse + specular;
 }
 
-subroutine(LightMethod)
-vec3 spotLight(Material material) {
-    if (usePbr) {
-        return pbrSpotLight(material);
-    }
-
-    return defaultSpotLight(material);
-}
 
 vec3 defaultSpotLight(Material material) {
     vec3 n = normalize(normal);

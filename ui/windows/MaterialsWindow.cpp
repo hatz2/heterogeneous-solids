@@ -201,12 +201,16 @@ namespace hs {
         ImGui::EndDisabled();
 
         float roughness = material.getRoughness();
+        ImGui::BeginDisabled(!profile.isUsePbr());
         if (ImGui::DragFloat("Roughness", &roughness, 0.01, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             material.setRoughness(roughness);
+        ImGui::EndDisabled();
 
         float metallic = material.getMetallic();
+        ImGui::BeginDisabled(!profile.isUsePbr());
         if (ImGui::DragFloat("Metallic", &metallic, 0.01, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             material.setMetallic(metallic);
+        ImGui::EndDisabled();
     }
 
     void MaterialsWindow::pickMaterial(MaterialEditor& materialEditor, HeterogeneousMaterial& hsMaterial, bool primary) {

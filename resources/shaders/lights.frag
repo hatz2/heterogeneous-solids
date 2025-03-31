@@ -14,6 +14,10 @@ vec3 defaultPointLight(Material material);
 vec3 defaultDirectionalLight(Material material);
 vec3 defaultSpotLight(Material material);
 
+vec3 pbrPointLight(Material material);
+vec3 pbrDirectionalLight(Material material);
+vec3 pbrSpotLight(Material material);
+
 
 subroutine(LightMethod)
 vec3 ambientLight(Material material) {

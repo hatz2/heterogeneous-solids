@@ -1,6 +1,6 @@
 {
   "surface": [
-    "surface.vert", "surface.frag", "pbr.frag", "lights.frag", "perlin.frag", "materials.frag"
+    "surface.vert", "surface.frag", "lights.frag", "pbr.frag", "perlin.frag", "materials.frag"
   ],
   "line": [
     "line.vert", "frag_color.frag"

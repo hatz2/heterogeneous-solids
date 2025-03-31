@@ -14,7 +14,7 @@ namespace hs {
     }
 
     Material::Material(glm::vec3 kA, glm::vec3 kD, glm::vec3 kS, float shininess) :
-        Material(kA, kD, kS, shininess, 0.0f, 0.0f)
+        Material(kA, kD, kS, shininess, 0.15f, 0.0f)
     {
 
     }

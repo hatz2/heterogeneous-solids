@@ -84,4 +84,9 @@ namespace hs {
     LightSet::iterator LightSet::end() noexcept {
         return compiledLights.end();
     }
+
+    const std::vector<std::reference_wrapper<Light>>& LightSet::getCompiledLights() const
+    {
+        return compiledLights;
+    }
 } // hs

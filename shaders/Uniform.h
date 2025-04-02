@@ -30,6 +30,7 @@ namespace hs {
         void set(glm::vec4);
         void set(float);
         void set(int);
+        void set(unsigned int);
 
         void set(float* data, size_t size);
         void set(glm::vec3* data, size_t size);

@@ -30,6 +30,8 @@ namespace hs {
         iterator begin() noexcept;
         iterator end() noexcept;
 
+        [[nodiscard]] const std::vector<std::reference_wrapper<Light>>& getCompiledLights() const;
+
     private:
         Light ambientLight;
         Light modelingLight;

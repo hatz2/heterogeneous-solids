@@ -46,7 +46,7 @@ namespace hs {
         void setLightProps(LightProps lightData);
         LightProps& getLightProps();
 
-        void apply(RenderContext& renderContext);
+        void apply(RenderContext& renderContext, unsigned int index);
     };
 
 } // hs

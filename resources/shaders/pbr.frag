@@ -1,4 +1,35 @@
 
+vec3 pbrAmbientLight(Material material, Light light);
+vec3 pbrPointLight(Material material, Light light);
+vec3 pbrDirectionalLight(Material material, Light light);
+vec3 pbrSpotLight(Material material, Light light);
+
+vec3 pbrLighting(Material material) {
+    vec3 result = vec3(0, 0, 0);
+
+    for (uint i = 0; i < numLights; ++i) {
+        Light light = lights[i];
+
+        if (light.type == ambient_light)
+            result += pbrAmbientLight(material, light);
+
+        else if (light.type == directional_light)
+            result += pbrDirectionalLight(material, light);
+
+        else if (light.type == spot_light)
+            result += pbrSpotLight(material, light);
+
+        else if (light.type == point_light)
+            result += pbrPointLight(material, light);
+
+    }
+
+    result = result / (result + vec3(1.0));
+    result = linearToSRGB(result);
+
+    return result;
+}
+
 vec3 fresnelSchlick(float cosTheta, vec3 f0) {
     return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
@@ -39,13 +70,17 @@ float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
     return ggx1 * ggx2;
 }
 
+vec3 pbrAmbientLight(Material material, Light light) {
+    return light.iA * material.kA;
+}
 
-vec3 pbrPointLight(Material material) {
+
+vec3 pbrPointLight(Material material, Light light) {
     return vec3(1, 0, 0);
 }
 
 
-vec3 pbrDirectionalLight(Material material) {
+vec3 pbrDirectionalLight(Material material, Light light) {
     vec3 n = normalize(normal);
     vec3 v = normalize(-position);
     vec3 l = normalize(-light.direction);
@@ -53,11 +88,10 @@ vec3 pbrDirectionalLight(Material material) {
 
     float metallic = material.metallic;
     float roughness = material.roughness;
+    vec3 materialColor = material.kD;
 
     vec3 f0 = vec3(0.04);
-    f0 = mix(f0, material.kD, metallic);
-
-    vec3 Lo = vec3(0.0);
+    f0 = mix(f0, materialColor, metallic);
 
     vec3 radiance = light.iD;
 
@@ -74,18 +108,13 @@ vec3 pbrDirectionalLight(Material material) {
     float nDotV = max(dot(n, v), 0.0);
 
     vec3 numerator = d * g * f;
-    float denominator = 4.0 * max(nDotV * nDotL, 0.0) + 0.0001;
-    vec3 specular = numerator / denominator;
+    float denominator = 4.0 * max(nDotV * nDotL, 0.0);
+    vec3 specular = numerator / max(denominator, 0.0001);
 
-    Lo += (kd * material.kD / M_PI + specular) * radiance * nDotL;
-
-    vec3 color = Lo;
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0 / 2.2));
-    return color;
+    return (kd * materialColor / M_PI + specular) * radiance * nDotL;
 }
 
 
-vec3 pbrSpotLight(Material material) {
+vec3 pbrSpotLight(Material material, Light light) {
     return vec3(0, 0, 1);
 }

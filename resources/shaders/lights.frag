@@ -32,12 +32,12 @@ vec3 pbrLighting(Material material);
 vec3 defaultLighting(Material material);
 
 
-vec3 sRGBtoLinear(vec3 color) {
+vec3 toLinear(vec3 color) {
     return pow(color, vec3(2.2));
 }
 
 
-vec3 linearToSRGB(vec3 color) {
+vec3 toSRGB(vec3 color) {
     return pow(color, vec3(1.0/2.2));
 }
 

@@ -25,7 +25,7 @@ vec3 pbrLighting(Material material) {
     }
 
     result = result / (result + vec3(1.0));
-    result = linearToSRGB(result);
+    result = toSRGB(result);
 
     return result;
 }
@@ -71,7 +71,7 @@ float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
 }
 
 vec3 pbrAmbientLight(Material material, Light light) {
-    return light.iA * material.kA;
+    return toLinear(light.iA) * toLinear(material.kA);
 }
 
 
@@ -88,12 +88,11 @@ vec3 pbrDirectionalLight(Material material, Light light) {
 
     float metallic = material.metallic;
     float roughness = material.roughness;
-    vec3 materialColor = material.kD;
+    vec3 materialColor = toLinear(material.kD);
+    vec3 radiance = toLinear(light.iD);
 
     vec3 f0 = vec3(0.04);
     f0 = mix(f0, materialColor, metallic);
-
-    vec3 radiance = light.iD;
 
     // cook-torrance
     float d = distributionGGX(n, h, roughness);

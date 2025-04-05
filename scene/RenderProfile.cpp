@@ -6,16 +6,16 @@
 
 namespace hs {
     RenderProfile::RenderProfile():
-        backgroundColor(1),
+        backgroundColor(0.2),
 
         showSurfaces(true),
         detailedSurfaces(true),
 
-        showMainLines(true),
+        showMainLines(false),
         mainLinesColor(0, 0, 0, 0.2),
         mainLinesThickness(4),
 
-        showDetailedLines(true),
+        showDetailedLines(false),
         detailedLinesColor(0, 0, 0, 0.2),
         detailedLinesThickness(2),
 
@@ -23,7 +23,7 @@ namespace hs {
         normalFieldColor(0.3, 0.3, 0.3, 0.4),
         normalFieldThickness(1),
 
-        showVertices(true),
+        showVertices(false),
         vertexColor(0, 0, 1, 0.7),
         vertexRadius(1),
 
@@ -31,14 +31,14 @@ namespace hs {
         selectionTint(0, 1, 0, 1),
         selectionDrawDepth(false),
 
-        showGridGizmo(true),
+        showGridGizmo(false),
         showLightsGizmo(false),
 
         antialiasing(true),
 
         usePbr(true)
     {
-
+        // TODO: Put back default parameters that have been changed
     }
 
     const glm::vec4& RenderProfile::getBackgroundColor() const {

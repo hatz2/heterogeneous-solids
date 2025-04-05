@@ -108,7 +108,7 @@ namespace hs {
 
         ImGui::PushItemWidth(65);
         float gamma = lightProps.getGamma();
-        if (ImGui::SliderAngle("Gamma", &gamma, 0, 360))
+        if (ImGui::SliderAngle("Gamma", &gamma, 0, 90))
             lightProps.setGamma(gamma);
     }
 

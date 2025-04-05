@@ -120,7 +120,7 @@ vec3 defaultSpotLight(Material material, Light light) {
 
     vec3 d = normalize(light.direction);
     float cosGamma = cos(light.spotAngle);
-    float spotFactor = float(cos(dot(-l, d)) >= cosGamma);
+    float spotFactor = float(dot(-l, d) >= cosGamma);
 
     return spotFactor * (diffuse + specular);
 }

@@ -1,8 +1,8 @@
-
 vec3 pbrAmbientLight(Material material, Light light);
 vec3 pbrPointLight(Material material, Light light);
 vec3 pbrDirectionalLight(Material material, Light light);
 vec3 pbrSpotLight(Material material, Light light);
+
 
 vec3 pbrLighting(Material material) {
     vec3 result = vec3(0, 0, 0);
@@ -30,6 +30,7 @@ vec3 pbrLighting(Material material) {
     return result;
 }
 
+
 vec3 fresnelSchlick(float cosTheta, vec3 f0) {
     return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
@@ -47,7 +48,6 @@ float distributionGGX(vec3 n, vec3 h, float roughness) {
 
     return numerator / denominator;
 }
-
 
 
 float geometrySchlickGGX(float nDotV, float roughness) {
@@ -70,13 +70,46 @@ float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
     return ggx1 * ggx2;
 }
 
+
 vec3 pbrAmbientLight(Material material, Light light) {
     return toLinear(light.iA) * toLinear(material.kA);
 }
 
 
 vec3 pbrPointLight(Material material, Light light) {
-    return vec3(1, 0, 0);
+    vec3 n = normalize(normal);
+    vec3 v = normalize(-position);
+    vec3 l = normalize(light.position - position);
+    vec3 h = normalize(v + l);
+
+    float metallic = material.metallic;
+    float roughness = material.roughness;
+    vec3 materialColor = toLinear(material.kD);
+
+    float distance = length(light.position - position);
+    float attenuation = 1.0 / (distance * distance);
+    vec3 radiance = toLinear(light.iD) * attenuation;
+
+    vec3 f0 = vec3(0.04);
+    f0 = mix(f0, materialColor, metallic);
+
+    // cook-torrance
+    float d = distributionGGX(n, h, roughness);
+    float g = geometrySmith(n, v, l, roughness);
+    vec3 f = fresnelSchlick(max(dot(h, v), 0.0), f0);
+
+    vec3 ks = f;
+    vec3 kd = vec3(1.0) - ks;
+    kd *= 1.0 - metallic;
+
+    float nDotL = max(dot(n, l), 0.0);
+    float nDotV = max(dot(n, v), 0.0);
+
+    vec3 numerator = d * g * f;
+    float denominator = 4.0 * max(nDotV * nDotL, 0.0);
+    vec3 specular = numerator / max(denominator, 0.0001);
+
+    return (kd * materialColor / M_PI + specular) * radiance * nDotL;
 }
 
 
@@ -115,5 +148,42 @@ vec3 pbrDirectionalLight(Material material, Light light) {
 
 
 vec3 pbrSpotLight(Material material, Light light) {
-    return vec3(0, 0, 1);
+    vec3 n = normalize(normal);
+    vec3 v = normalize(-position);
+    vec3 l = normalize(light.position - position);
+    vec3 h = normalize(v + l);
+
+    vec3 lightDir = normalize(light.direction);
+    float cosGamma = cos(light.spotAngle);
+    float cosTheta = dot(-l, lightDir);
+
+    if (cosTheta <= cosGamma) {
+        return vec3(0.0);
+    }
+
+    float metallic = material.metallic;
+    float roughness = material.roughness;
+    vec3 materialColor = toLinear(material.kD);
+    vec3 radiance = toLinear(light.iD);
+
+    vec3 f0 = vec3(0.04);
+    f0 = mix(f0, materialColor, metallic);
+
+    // cook-torrance
+    float d = distributionGGX(n, h, roughness);
+    float g = geometrySmith(n, v, l, roughness);
+    vec3 f = fresnelSchlick(max(dot(h, v), 0.0), f0);
+
+    vec3 ks = f;
+    vec3 kd = vec3(1.0) - ks;
+    kd *= 1.0 - metallic;
+
+    float nDotL = max(dot(n, l), 0.0);
+    float nDotV = max(dot(n, v), 0.0);
+
+    vec3 numerator = d * g * f;
+    float denominator = 4.0 * max(nDotV * nDotL, 0.0);
+    vec3 specular = numerator / max(denominator, 0.0001);
+
+    return (kd * materialColor / M_PI + specular) * radiance * nDotL;
 }

@@ -4,6 +4,7 @@
 
 #include "Light.h"
 
+#include <sstream>
 #include <utility>
 
 namespace hs {
@@ -57,40 +58,75 @@ namespace hs {
         return lightProps;
     }
 
-    void Light::apply(RenderContext& renderContext) {
-        switch (lightType) {
-            case LightType::Ambient:
-                renderContext.getUniform("light.iA").set(lightProps.getIA());
-                renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "ambientLight");
-                break;
-            case LightType::Point:
-                renderContext.getUniform("light.position").set(
-                    (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
-                );
-                renderContext.getUniform("light.iD").set(lightProps.getID());
-                renderContext.getUniform("light.iS").set(lightProps.getIS());
-                renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "pointLight");
-                break;
-            case LightType::Directional:
-                renderContext.getUniform("light.direction").set(
-                    (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
-                );
-                renderContext.getUniform("light.iD").set(lightProps.getID());
-                renderContext.getUniform("light.iS").set(lightProps.getIS());
-                renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "directionalLight");
-                break;
-            case LightType::SpotLight:
-                renderContext.getUniform("light.direction").set(
-                    (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
-                );
-                renderContext.getUniform("light.position").set(
-                    (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
-                );
-                renderContext.getUniform("light.iD").set(lightProps.getID());
-                renderContext.getUniform("light.iS").set(lightProps.getIS());
-                renderContext.getUniform("light.spotAngle").set(lightProps.getGamma());
-                renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "spotLight");
-                break;
-        }
+    void Light::apply(RenderContext& renderContext, const unsigned int index) {
+        std::stringstream typeProperty;
+        typeProperty << "lights[" << index << "].type";
+        renderContext.getUniform(typeProperty.str()).set(static_cast<int>(lightType));
+
+
+        std::stringstream iAProperty;
+        iAProperty << "lights[" << index << "].iA";
+        renderContext.getUniform(iAProperty.str()).set(lightProps.getIA());
+
+        std::stringstream iDProperty;
+        iDProperty << "lights[" << index << "].iD";
+        renderContext.getUniform(iDProperty.str()).set(lightProps.getID());
+
+        std::stringstream iSProperty;
+        iSProperty << "lights[" << index << "].iS";
+        renderContext.getUniform(iSProperty.str()).set(lightProps.getIS());
+
+        std::stringstream positionProperty;
+        positionProperty << "lights[" << index << "].position";
+        renderContext.getUniform(positionProperty.str()).set(
+            static_cast<glm::vec3>(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
+        );
+
+        std::stringstream directionProperty;
+        directionProperty << "lights[" << index << "].direction";
+        renderContext.getUniform(directionProperty.str()).set(
+            static_cast<glm::vec3>(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
+        );
+
+        std::stringstream spotAngleProperty;
+        spotAngleProperty << "lights[" << index << "].spotAngle";
+        renderContext.getUniform(spotAngleProperty.str()).set(lightProps.getGamma());
+
+
+
+        // switch (lightType) {
+        //     case LightType::Ambient:
+        //         renderContext.getUniform("light[.iA").set(lightProps.getIA());
+        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "ambientLight");
+        //         break;
+        //     case LightType::Point:
+        //         renderContext.getUniform("light.position").set(
+        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
+        //         );
+        //         renderContext.getUniform("light.iD").set(lightProps.getID());
+        //         renderContext.getUniform("light.iS").set(lightProps.getIS());
+        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "pointLight");
+        //         break;
+        //     case LightType::Directional:
+        //         renderContext.getUniform("light.direction").set(
+        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
+        //         );
+        //         renderContext.getUniform("light.iD").set(lightProps.getID());
+        //         renderContext.getUniform("light.iS").set(lightProps.getIS());
+        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "directionalLight");
+        //         break;
+        //     case LightType::SpotLight:
+        //         renderContext.getUniform("light.direction").set(
+        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
+        //         );
+        //         renderContext.getUniform("light.position").set(
+        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
+        //         );
+        //         renderContext.getUniform("light.iD").set(lightProps.getID());
+        //         renderContext.getUniform("light.iS").set(lightProps.getIS());
+        //         renderContext.getUniform("light.spotAngle").set(lightProps.getGamma());
+        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "spotLight");
+        //         break;
+        // }
     }
 } // hs

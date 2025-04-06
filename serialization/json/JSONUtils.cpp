@@ -36,6 +36,8 @@ namespace hs::json {
     void serialize(nlohmann::json& json, const Material& material) {
         json["description"] = material.getDescriptionProp().getDescription();
         json["shininess"] = material.getShininess();
+        json["metallic"] = material.getMetallic();
+        json["roughness"] = material.getRoughness();
         auto kA = material.getKA();
         json["kA"] = { kA.x, kA.y, kA.z };
         auto kD = material.getKD();
@@ -47,6 +49,8 @@ namespace hs::json {
     void deserialize(nlohmann::json& json, Material& material) {
         material.getDescriptionProp().setDescription(json["description"]);
         material.setShininess(json["shininess"]);
+        material.setMetallic(json["metallic"]);
+        material.setRoughness(json["roughness"]);
         material.setKA({ json["kA"][0], json["kA"][1], json["kA"][2] });
         material.setKD({ json["kD"][0], json["kD"][1], json["kD"][2] });
         material.setKS({ json["kS"][0], json["kS"][1], json["kS"][2] });

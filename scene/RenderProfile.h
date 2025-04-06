@@ -40,6 +40,8 @@ namespace hs {
         bool showLightsGizmo;
 
         bool antialiasing;
+
+        bool usePbr;
     public:
         RenderProfile();
 
@@ -105,6 +107,9 @@ namespace hs {
 
         [[nodiscard]] bool isAntialiasing() const;
         void setAntialiasing(bool antialiasing);
+
+        [[nodiscard]] bool isUsePbr() const;
+        void setUsePbr(bool usePbr);
     };
 
 } // hs

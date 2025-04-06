@@ -49,6 +49,11 @@ namespace hs {
         glProgramUniform1i(shaderProgram.get().getId(), location, data);
     }
 
+    void Uniform::set(unsigned int data)
+    {
+        glProgramUniform1ui(shaderProgram.get().getId(), location, data);
+    }
+
     void Uniform::set(float* data, size_t size) {
         glProgramUniform1fv(shaderProgram.get().getId(), location, (int)size, data);
     }

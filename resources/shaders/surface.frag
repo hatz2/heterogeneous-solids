@@ -12,14 +12,18 @@ uniform struct Material {
     vec3 kS;
 
     float shininess;
+    float roughness;
+    float metallic;
 } materials[2];
 
 layout (location = 0) out vec4 fragColor;
 
-subroutine vec3 LightMethod(Material material);
-subroutine uniform LightMethod lightMethod;
+//subroutine vec3 LightMethod(Material material);
+//subroutine uniform LightMethod lightMethod;
 subroutine Material SelectMaterial();
 subroutine uniform SelectMaterial selectMaterial;
+
+vec3 lightMethod(Material material);
 
 void main() {
     Material material = selectMaterial();

@@ -15,6 +15,7 @@ namespace hs {
     public:
         Material();
         Material(glm::vec3 kA, glm::vec3 kD, glm::vec3 kS, float shininess);
+        Material(glm::vec3 kA, glm::vec3 kD, glm::vec3 kS, float shininess, float roughness, float metallic);
 
         [[nodiscard]] const glm::vec3& getKA() const;
         void setKA(glm::vec3 kA);
@@ -28,12 +29,20 @@ namespace hs {
         [[nodiscard]] const float& getShininess() const;
         void setShininess(float shininess);
 
+        [[nodiscard]] const float getRoughness() const;
+        void setRoughness(float roughness);
+
+        [[nodiscard]] const float getMetallic() const;
+        void setMetallic(float metallic);
+
         [[nodiscard]] DescriptionProp& getDescriptionProp() const;
     private:
         glm::vec3 kA;
         glm::vec3 kD;
         glm::vec3 kS;
         float shininess;
+        float roughness;
+        float metallic;
         std::unique_ptr<DescriptionProp> description;
     };
 

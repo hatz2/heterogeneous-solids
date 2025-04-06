@@ -17,7 +17,7 @@ namespace hs {
     private:
         static void renderHeterogeneousMaterial(const Context& context, HeterogeneousMaterial& hsMaterial);
         static void renderMaterial(const Context& context, Material& material);
-        static void materialsProperties(Material& material);
+        static void materialsProperties(const Context& context, Material& material);
         static void pickMaterial(MaterialEditor& materialEditor, HeterogeneousMaterial& hsMaterial, bool primary);
     };
 

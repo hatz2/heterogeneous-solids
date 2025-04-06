@@ -181,18 +181,31 @@ namespace hs {
 
         renderContext.setRenderMode(RenderMode::Surfaces);
         renderContext.setDetailedRendering(profile.isDetailedSurfaces());
+        renderContext.getUniform("usePbr").set(profile.isUsePbr());
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        auto it = scene.getLights().begin();
-        if (it < scene.getLights().end()) {
-            it->get().apply(renderContext);
-            scene.getRoot().getRenderer()(renderContext);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-            for (; it < scene.getLights().end(); it++) {
-                it->get().apply(renderContext);
-                scene.getRoot().getRenderer()(renderContext);
-            }
+        auto lights = scene.getLights().getCompiledLights();
+
+        renderContext.getUniform("numLights").set(static_cast<unsigned int>(lights.size()));
+
+        for (size_t i = 0; i < lights.size(); ++i)
+        {
+            lights[i].get().apply(renderContext, i);
         }
+
+        scene.getRoot().getRenderer()(renderContext);
+
+
+        // auto it = scene.getLights().begin();
+        // if (it < scene.getLights().end()) {
+        //     it->get().apply(renderContext);
+        //     scene.getRoot().getRenderer()(renderContext);
+        //     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        //     for (; it < scene.getLights().end(); it++) {
+        //         it->get().apply(renderContext);
+        //         scene.getRoot().getRenderer()(renderContext);
+        //     }
+        // }
     }
 
     void Renderer::renderLines(const RenderProfile& profile, const Scene& scene, bool selection) {

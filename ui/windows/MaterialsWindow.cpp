@@ -149,14 +149,14 @@ namespace hs {
             ImGui::PushID("Primary");
             pickMaterial(materialEditor, hsMaterial, true);
             ImGui::Spacing();
-            materialsProperties(*hsMaterial.getPrimaryMaterial());
+            materialsProperties(context, *hsMaterial.getPrimaryMaterial());
             ImGui::PopID();
         }
         if (ImGui::CollapsingHeader("Properties: Secondary", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::PushID("Secondary");
             pickMaterial(materialEditor, hsMaterial, false);
             ImGui::Spacing();
-            materialsProperties(*hsMaterial.getSecondaryMaterial());
+            materialsProperties(context, *hsMaterial.getSecondaryMaterial());
             ImGui::PopID();
         }
     }
@@ -172,10 +172,12 @@ namespace hs {
         )) state.setDescription(description);
 
         ImGui::Spacing();
-        if (ImGui::CollapsingHeader("Properties", ImGuiTreeNodeFlags_DefaultOpen)) materialsProperties(material);
+        if (ImGui::CollapsingHeader("Properties", ImGuiTreeNodeFlags_DefaultOpen)) materialsProperties(context, material);
     }
 
-    void MaterialsWindow::materialsProperties(Material& material) {
+    void MaterialsWindow::materialsProperties(const Context& context, Material& material) {
+        const RenderProfile& profile = context.getRenderProfile();
+
         glm::vec3 ka = material.getKA();
         if (ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ka)))
             material.setKA(ka);
@@ -185,12 +187,28 @@ namespace hs {
             material.setKD(kd);
 
         glm::vec3 ks = material.getKS();
+        ImGui::BeginDisabled(profile.isUsePbr());
         if (ImGui::ColorEdit3("Specular Color", glm::value_ptr(ks)))
             material.setKS(ks);
+        ImGui::EndDisabled();
 
         float shininess = material.getShininess();
-        if (ImGui::DragFloat("Shininess", &shininess, 0.5, 1, 0, "%.1f", ImGuiSliderFlags_AlwaysClamp))
+        ImGui::BeginDisabled(profile.isUsePbr());
+        if (ImGui::DragFloat("Shininess", &shininess, 0.1, 0, 128, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             material.setShininess(shininess);
+        ImGui::EndDisabled();
+
+        float roughness = material.getRoughness();
+        ImGui::BeginDisabled(!profile.isUsePbr());
+        if (ImGui::DragFloat("Roughness", &roughness, 0.01, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+            material.setRoughness(roughness);
+        ImGui::EndDisabled();
+
+        float metallic = material.getMetallic();
+        ImGui::BeginDisabled(!profile.isUsePbr());
+        if (ImGui::DragFloat("Metallic", &metallic, 0.01, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+            material.setMetallic(metallic);
+        ImGui::EndDisabled();
     }
 
     void MaterialsWindow::pickMaterial(MaterialEditor& materialEditor, HeterogeneousMaterial& hsMaterial, bool primary) {

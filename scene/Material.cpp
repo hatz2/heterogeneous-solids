@@ -8,13 +8,19 @@
 
 namespace hs {
     Material::Material() :
-        kA(0.2), kD(0.5), kS(0.5), shininess(16), description(std::make_unique<DescriptionPropImpl>("Material"))
+        Material(glm::vec3(0.2), glm::vec3(0.5), glm::vec3(0.5), 16, 0, 0)
     {
 
     }
 
     Material::Material(glm::vec3 kA, glm::vec3 kD, glm::vec3 kS, float shininess) :
-            kA(kA), kD(kD), kS(kS), shininess(shininess), description(std::make_unique<DescriptionPropImpl>("Material"))
+        Material(kA, kD, kS, shininess, 0.15f, 0.0f)
+    {
+
+    }
+
+    Material::Material(glm::vec3 kA, glm::vec3 kD, glm::vec3 kS, float shininess, float roughness, float metallic) :
+            kA(kA), kD(kD), kS(kS), shininess(shininess), roughness(roughness), metallic(metallic), description(std::make_unique<DescriptionPropImpl>("Material"))
     {
 
     }
@@ -49,6 +55,22 @@ namespace hs {
 
     void Material::setShininess(float shininess) {
         Material::shininess = shininess;
+    }
+
+    const float Material::getRoughness() const {
+        return roughness;
+    }
+
+    void Material::setRoughness(float roughness) {
+        Material::roughness = roughness;
+    }
+
+    const float Material::getMetallic() const {
+        return metallic;
+    }
+
+    void Material::setMetallic(float metallic) {
+        Material::metallic = metallic;
     }
 
     DescriptionProp& Material::getDescriptionProp() const {

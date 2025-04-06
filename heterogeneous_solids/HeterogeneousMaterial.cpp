@@ -139,6 +139,8 @@ namespace hs {
         renderContext.getUniform("materials[0].kD").set(material.getKD());
         renderContext.getUniform("materials[0].kS").set(material.getKS());
         renderContext.getUniform("materials[0].shininess").set(material.getShininess());
+        renderContext.getUniform("materials[0].roughness").set(material.getRoughness());
+        renderContext.getUniform("materials[0].metallic").set(material.getMetallic());
     }
 
     void HeterogeneousMaterial::applySecondary(RenderContext& renderContext, const Material& material) {
@@ -146,5 +148,7 @@ namespace hs {
         renderContext.getUniform("materials[1].kD").set(material.getKD());
         renderContext.getUniform("materials[1].kS").set(material.getKS());
         renderContext.getUniform("materials[1].shininess").set(material.getShininess());
+        renderContext.getUniform("materials[1].roughness").set(material.getRoughness());
+        renderContext.getUniform("materials[1].metallic").set(material.getMetallic());
     }
 } // hs

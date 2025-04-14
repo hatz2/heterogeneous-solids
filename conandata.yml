@@ -10,3 +10,4 @@ requirements:
   - "nlohmann_json/3.11.3"
   - "spdlog/1.13.0"
   - "assimp/5.2.2"
+  - "stb/cci.20230920"

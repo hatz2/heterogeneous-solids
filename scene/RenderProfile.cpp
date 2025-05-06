@@ -36,7 +36,8 @@ namespace hs {
 
         antialiasing(true),
 
-        usePbr(true)
+        usePbr(true),
+        showSkybox(true)
     {
         // TODO: Put back default parameters that have been changed
     }
@@ -217,5 +218,15 @@ namespace hs {
     void RenderProfile::setUsePbr(bool usePbr)
     {
         this->usePbr = usePbr;
+    }
+
+    bool RenderProfile::isShowSkybox() const
+    {
+        return showSkybox;
+    }
+
+    void RenderProfile::setShowSkybox(bool showSkybox)
+    {
+        this->showSkybox = showSkybox;
     }
 } // hs

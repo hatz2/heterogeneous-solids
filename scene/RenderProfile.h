@@ -42,6 +42,7 @@ namespace hs {
         bool antialiasing;
 
         bool usePbr;
+        bool showSkybox;
     public:
         RenderProfile();
 
@@ -110,6 +111,9 @@ namespace hs {
 
         [[nodiscard]] bool isUsePbr() const;
         void setUsePbr(bool usePbr);
+
+        [[nodiscard]] bool isShowSkybox() const;
+        void setShowSkybox(bool showSkybox);
     };
 
 } // hs

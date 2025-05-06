@@ -12,6 +12,7 @@
 #include "../shaders/ShaderManager.h"
 #include "gizmos/Grid.h"
 #include "RenderProfile.h"
+#include "Cubemap.h"
 
 namespace hs {
 
@@ -25,11 +26,15 @@ namespace hs {
         // GIZMOS
         Grid grid;
 
+        // CUBEMAP
+        std::unique_ptr<Cubemap> cubemap;
+
         // RESOURCES
         ShaderManager& shaderManager;
 
         void renderObjects(const RenderProfile& profile, const Scene& scene);
         void renderGizmos(const RenderProfile& profile, const Scene& scene);
+        void renderSkybox(const RenderProfile& profile, const Scene& scene);
 
         void renderSurfaces(const RenderProfile& profile, const Scene& scene);
         void renderLines(const RenderProfile& profile, const Scene& scene, bool selection = false);

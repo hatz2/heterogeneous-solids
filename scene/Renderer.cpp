@@ -2,14 +2,23 @@
 // Created by Alberto Elorza Rubio on 28/11/2023.
 //
 
+#include <filesystem>
 #include "Renderer.h"
 #include "gizmos/LightGizmo.h"
 
-#include <utility>
+#include <iostream>
 
 namespace hs {
     Renderer::Renderer(ShaderManager& shaderManager) : shaderManager(shaderManager) {
-
+        std::vector<std::string> faces = {
+            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/right.jpg",
+            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/left.jpg",
+            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/top.jpg",
+            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/bottom.jpg",
+            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/front.jpg",
+            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/back.jpg"
+        };
+        cubemap = std::make_unique<Cubemap>(faces);
     }
 
     std::unique_ptr<SelectionController> Renderer::renderColorSelection(const RenderProfile& profile, const Scene& scene) {
@@ -84,6 +93,8 @@ namespace hs {
         auto& modelingLight = scene.getLights().getModelingLight();
         modelingLight.getLightProps().setPosition(scene.getCamera().getPosition());
         modelingLight.getLightProps().setLookAt(scene.getCamera().getLookAt());
+
+        renderSkybox(profile, scene);
 
         renderObjects(profile, scene);
 
@@ -171,6 +182,27 @@ namespace hs {
         }
     }
 
+    void Renderer::renderSkybox(const RenderProfile& profile, const Scene& scene)
+    {
+        if (!profile.isShowSkybox())
+            return;
+
+        GLboolean depthMask;
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
+        glDepthMask(GL_FALSE);
+
+        auto view = glm::mat4(glm::mat3(scene.getCamera().view()));
+
+        RenderContext renderContext(*shaderManager.requireShaderProgram("skybox"));
+        renderContext.setViewMatrix(view);
+        renderContext.setProjectionMatrix(scene.getCamera().projection());
+
+        cubemap->apply(renderContext);
+        scene.getSkybox().render(renderContext);
+
+        glDepthMask(depthMask);
+    }
+
     void Renderer::renderSurfaces(const RenderProfile& profile, const Scene &scene) {
         if (!profile.isShowSurfaces()) return;
 
@@ -194,18 +226,6 @@ namespace hs {
         }
 
         scene.getRoot().getRenderer()(renderContext);
-
-
-        // auto it = scene.getLights().begin();
-        // if (it < scene.getLights().end()) {
-        //     it->get().apply(renderContext);
-        //     scene.getRoot().getRenderer()(renderContext);
-        //     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-        //     for (; it < scene.getLights().end(); it++) {
-        //         it->get().apply(renderContext);
-        //         scene.getRoot().getRenderer()(renderContext);
-        //     }
-        // }
     }
 
     void Renderer::renderLines(const RenderProfile& profile, const Scene& scene, bool selection) {

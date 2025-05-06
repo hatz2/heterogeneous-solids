@@ -19,5 +19,8 @@
   ],
   "light_gizmo": [
     "light_gizmo.vert", "frag_color.frag"
+  ],
+  "skybox": [
+    "skybox.vert", "skybox.frag"
   ]
 }

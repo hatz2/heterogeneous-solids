@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "bindings/imgui_impl_glfw.h"

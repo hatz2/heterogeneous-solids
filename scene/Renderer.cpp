@@ -94,11 +94,11 @@ namespace hs {
         modelingLight.getLightProps().setPosition(scene.getCamera().getPosition());
         modelingLight.getLightProps().setLookAt(scene.getCamera().getLookAt());
 
-        renderSkybox(profile, scene);
-
         renderObjects(profile, scene);
 
         renderGizmos(profile, scene);
+
+        renderSkybox(profile, scene);
 
         glDisable(GL_BLEND);
     }

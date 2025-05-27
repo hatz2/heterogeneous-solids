@@ -15,6 +15,40 @@ namespace hs {
         skybox(std::make_unique<Mesh>()),
         selectedObject(*root)
     {
+        initSkybox();
+    }
+
+    Camera& Scene::getCamera() const {
+        return *camera;
+    }
+
+    GroupNode& Scene::getRoot() const {
+        return *root;
+    }
+
+    LightSet& Scene::getLights() const {
+        return *lights;
+    }
+
+    Mesh& Scene::getSkybox() const
+    {
+        return *skybox;
+    }
+
+    void Scene::setSelectedObject(SceneNode& object) {
+        selectedObject = std::ref(object);
+    }
+
+    void Scene::unsetSelectedObject() {
+        selectedObject = *root;
+    }
+
+    SceneNode& Scene::getSelectedObject() const {
+        return selectedObject;
+    }
+
+    void Scene::initSkybox()
+    {
         std::vector<glm::vec3> vertices = {
             {-1.0f,  1.0f, -1.0f}, // 0
             {-1.0f, -1.0f, -1.0f}, // 1
@@ -48,34 +82,5 @@ namespace hs {
 
         skybox->setVertices(vertices);
         skybox->setIndices(indices);
-    }
-
-    Camera& Scene::getCamera() const {
-        return *camera;
-    }
-
-    GroupNode& Scene::getRoot() const {
-        return *root;
-    }
-
-    LightSet& Scene::getLights() const {
-        return *lights;
-    }
-
-    Mesh& Scene::getSkybox() const
-    {
-        return *skybox;
-    }
-
-    void Scene::setSelectedObject(SceneNode& object) {
-        selectedObject = std::ref(object);
-    }
-
-    void Scene::unsetSelectedObject() {
-        selectedObject = *root;
-    }
-
-    SceneNode& Scene::getSelectedObject() const {
-        return selectedObject;
     }
 } // hs

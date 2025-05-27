@@ -27,6 +27,7 @@ namespace hs {
         void unsetSelectedObject();
         [[nodiscard]] SceneNode& getSelectedObject() const;
     private:
+        void initSkybox();
         // OBJECTS
         std::unique_ptr<Camera> camera;
         std::unique_ptr<GroupNode> root;

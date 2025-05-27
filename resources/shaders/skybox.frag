@@ -7,5 +7,8 @@ uniform samplerCube cubemap;
 layout (location = 0) out vec4 fragColor;
 
 void main() {
-    fragColor = texture(cubemap, texCoords);
+    vec3 color = texture(cubemap, texCoords).rgb;
+    color = color / (color + vec3(1.0));
+    color = pow(color, vec3(1.0/2.2));
+    fragColor = vec4(color, 1.0);
 }

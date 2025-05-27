@@ -18,7 +18,8 @@ namespace hs {
             "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/front.jpg",
             "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/back.jpg"
         };
-        cubemap = std::make_unique<Cubemap>(faces);
+        //cubemap = std::make_unique<Cubemap>(faces);
+        cubemap = std::make_unique<Cubemap>("C:\\Users\\alext\\Documents\\TFM\\newport_loft.hdr", shaderManager);
     }
 
     std::unique_ptr<SelectionController> Renderer::renderColorSelection(const RenderProfile& profile, const Scene& scene) {
@@ -79,6 +80,7 @@ namespace hs {
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
         if (profile.isAntialiasing()) glEnable(GL_MULTISAMPLE);
         else glDisable(GL_MULTISAMPLE);
@@ -191,13 +193,14 @@ namespace hs {
         glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
         glDepthMask(GL_FALSE);
 
-        auto view = glm::mat4(glm::mat3(scene.getCamera().view()));
-
         RenderContext renderContext(*shaderManager.requireShaderProgram("skybox"));
-        renderContext.setViewMatrix(view);
+        renderContext.setViewMatrix(scene.getCamera().view());
         renderContext.setProjectionMatrix(scene.getCamera().projection());
 
-        cubemap->apply(renderContext);
+        renderContext.getUniform("cubemap").set(0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getId());
+
         scene.getSkybox().render(renderContext);
 
         glDepthMask(depthMask);
@@ -214,6 +217,9 @@ namespace hs {
         renderContext.setRenderMode(RenderMode::Surfaces);
         renderContext.setDetailedRendering(profile.isDetailedSurfaces());
         renderContext.getUniform("usePbr").set(profile.isUsePbr());
+        renderContext.getUniform("irradianceMap").set(0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getConvolutedId());
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         auto lights = scene.getLights().getCompiledLights();

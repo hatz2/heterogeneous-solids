@@ -1,3 +1,5 @@
+uniform samplerCube irradianceMap;
+
 vec3 pbrAmbientLight(Material material, Light light);
 vec3 pbrPointLight(Material material, Light light);
 vec3 pbrDirectionalLight(Material material, Light light);
@@ -10,10 +12,7 @@ vec3 pbrLighting(Material material) {
     for (uint i = 0; i < numLights; ++i) {
         Light light = lights[i];
 
-        if (light.type == ambient_light)
-            result += pbrAmbientLight(material, light);
-
-        else if (light.type == directional_light)
+        if (light.type == directional_light)
             result += pbrDirectionalLight(material, light);
 
         else if (light.type == spot_light)
@@ -22,7 +21,12 @@ vec3 pbrLighting(Material material) {
         else if (light.type == point_light)
             result += pbrPointLight(material, light);
 
+//        else if (light.type == ambient_light)
+//            result += pbrAmbientLight(material, light);
+
     }
+
+    result += iblAmbientLight(material);
 
     result = result / (result + vec3(1.0));
     result = toSRGB(result);
@@ -33,6 +37,10 @@ vec3 pbrLighting(Material material) {
 
 vec3 fresnelSchlick(float cosTheta, vec3 f0) {
     return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 f0, float roughness) {
+    return f0 + (max(vec3(1.0 - roughness), f0) - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 
@@ -70,6 +78,25 @@ float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
     return ggx1 * ggx2;
 }
 
+vec3 iblAmbientLight(Material material) {
+    vec3 n = normalize(normal);
+    vec3 v = normalize(-position);
+
+    vec3 materialColor = material.kD;
+    float metallic = material.metallic;
+    float roughness = material.roughness;
+
+    vec3 f0 = vec3(0.04);
+    f0 = mix(f0, materialColor, metallic);
+
+    vec3 ks = fresnelSchlick(max(dot(n, v), 0.0), f0);
+    //vec3 ks = fresnelSchlickRoughness(max(dot(n, v), 0.0), f0, roughness);
+    vec3 kd = 1.0 - ks;
+    vec3 irradiance = texture(irradianceMap, n).rgb;
+    vec3 diffuse = irradiance * toLinear(materialColor);
+
+    return (kd * diffuse);
+}
 
 vec3 pbrAmbientLight(Material material, Light light) {
     return toLinear(light.iA) * toLinear(material.kA);

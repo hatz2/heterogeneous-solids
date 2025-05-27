@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include "RenderContext.h"
+#include "../shaders/ShaderManager.h"
 
 namespace hs {
     class Cubemap {
@@ -25,13 +26,24 @@ namespace hs {
          * @param faces
          */
         explicit Cubemap(const std::vector<std::string>& faces);
+        explicit Cubemap(const std::string& hdrImgPath, ShaderManager& shaderManager);
 
         void apply(RenderContext& renderContext) const;
 
         [[nodiscard]] int getId() const;
+        [[nodiscard]] int getConvolutedId() const;
 
     private:
+        void initFrameBuffers();
+        [[nodiscard]] unsigned int createEmptyCubeTexture(const int width, const int height);
+        [[nodiscard]] unsigned int loadHdrTexture(const std::string& hdrImgPath);
+        void mapHdrTextureToCubeTexture(unsigned int hdrTexture, ShaderManager& shaderManager);
+        void convolute(ShaderManager& shaderManager);
+
         unsigned int id;
+        unsigned int convolutedId;
+        unsigned int frameBuffer;
+        unsigned int renderBuffer;
     };
 }
 

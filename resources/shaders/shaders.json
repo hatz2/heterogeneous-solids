@@ -22,5 +22,11 @@
   ],
   "skybox": [
     "skybox.vert", "skybox.frag"
+  ],
+  "cubemap": [
+    "cubemap.vert", "cubemap.frag"
+  ],
+  "irradiance": [
+    "cubemap.vert", "irradiance.frag"
   ]
 }

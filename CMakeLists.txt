@@ -329,8 +329,10 @@ add_executable(heterogeneous_solids
         heterogeneous_solids/coefs/PositionCoef.h
         command/basic/SetCoefContinuityCommand.cpp
         command/basic/SetCoefContinuityCommand.h
-        scene/Cubemap.cpp
-        scene/Cubemap.h
+        scene/ibl/Builder.h
+        scene/ibl/Data.h
+        scene/ibl/BuilderImp.cpp
+        scene/ibl/BuilderImp.h
 )
 
 target_compile_definitions(heterogeneous_solids PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)

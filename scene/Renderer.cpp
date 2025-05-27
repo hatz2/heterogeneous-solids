@@ -8,18 +8,14 @@
 
 #include <iostream>
 
+#include "ibl/BuilderImp.h"
+
 namespace hs {
     Renderer::Renderer(ShaderManager& shaderManager) : shaderManager(shaderManager) {
-        std::vector<std::string> faces = {
-            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/right.jpg",
-            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/left.jpg",
-            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/top.jpg",
-            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/bottom.jpg",
-            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/front.jpg",
-            "C:/Users/alext/Documents/GitHub/heterogeneous-solids/resources/cubemaps/skybox/back.jpg"
-        };
-        //cubemap = std::make_unique<Cubemap>(faces);
-        cubemap = std::make_unique<Cubemap>("C:\\Users\\alext\\Documents\\TFM\\newport_loft.hdr", shaderManager);
+        iblData = ibl::BuilderImp("C:\\Users\\alext\\Documents\\TFM\\newport_loft.hdr", shaderManager)
+                    .generateEnvironmentMap()
+                    .generateIrradianceMap()
+                    .getResult();
     }
 
     std::unique_ptr<SelectionController> Renderer::renderColorSelection(const RenderProfile& profile, const Scene& scene) {
@@ -197,9 +193,9 @@ namespace hs {
         renderContext.setViewMatrix(scene.getCamera().view());
         renderContext.setProjectionMatrix(scene.getCamera().projection());
 
-        renderContext.getUniform("cubemap").set(0);
+        renderContext.getUniform("environmentMap").set(0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getId());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.environmentMap);
 
         scene.getSkybox().render(renderContext);
 
@@ -219,7 +215,7 @@ namespace hs {
         renderContext.getUniform("usePbr").set(profile.isUsePbr());
         renderContext.getUniform("irradianceMap").set(0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getConvolutedId());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.irradianceMap);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         auto lights = scene.getLights().getCompiledLights();

@@ -12,7 +12,7 @@
 #include "../shaders/ShaderManager.h"
 #include "gizmos/Grid.h"
 #include "RenderProfile.h"
-#include "Cubemap.h"
+#include "ibl/Builder.h"
 
 namespace hs {
 
@@ -27,7 +27,7 @@ namespace hs {
         Grid grid;
 
         // CUBEMAP
-        std::unique_ptr<Cubemap> cubemap;
+        ibl::Data iblData;
 
         // RESOURCES
         ShaderManager& shaderManager;

@@ -1,7 +1,7 @@
 #version 410 core
 
 in vec3 localPos;
-uniform samplerCube cubeMap;
+uniform samplerCube environmentMap;
 layout (location = 0) out vec4 fragColor;
 
 const float PI = 3.14159265359;
@@ -26,7 +26,7 @@ vec3 convolution(vec3 normal)
             // Tangent coord to world coord
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal;
 
-            vec3 texColor = texture(cubeMap, sampleVec).rgb;
+            vec3 texColor = texture(environmentMap, sampleVec).rgb;
 
             irradiance +=  texColor * cos(theta) * sin(theta);
             ++numSamples;

@@ -16,6 +16,7 @@ namespace hs {
                     .generateEnvironmentMap()
                     .generateIrradianceMap()
                     .generatePrefilteredMap()
+                    .generateBrdfLUT()
                     .getResult();
     }
 

@@ -19,7 +19,7 @@ namespace hs::ibl
         virtual Builder& generateEnvironmentMap(const int size = 2048) = 0;
         virtual Builder& generateIrradianceMap(const int size = 32) = 0;
         virtual Builder& generatePrefilteredMap(const int size = 128) = 0;
-        virtual Builder& generateBrdfLUT(const int size) = 0;
+        virtual Builder& generateBrdfLUT(const int size = 512) = 0;
 
     protected:
         explicit Builder(const std::string& path, ShaderManager& shaderManager)

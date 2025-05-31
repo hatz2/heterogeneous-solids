@@ -1,54 +1,57 @@
 #version 410 core
 
-in vec3 localPos;
-layout (location = 0) out vec4 fragColor;
-
-uniform samplerCube environmentMap;
-uniform float roughness;
-uniform float environmentMapResolution;
+in vec2 texCoords;
+layout (location = 0) out vec2 fragColor;
 
 const float PI = 3.14159265359;
 
 float radicalInverseVdc(uint bits);
 vec2 hammersley(uint i, uint N);
 vec3 importanceSampleGGX(vec2 xi, vec3 n, float roughness);
-float distributionGGX(vec3 n, vec3 h, float roughness);
+float geometrySchlickGGX(float nDotV, float roughness);
+float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness);
 
-void main()
+vec2 integrateBRDF(float nDotV, float roughness)
 {
-    vec3 n = normalize(localPos);
-    vec3 r = n;
-    vec3 v = r;
+    vec3 v;
+    v.x = sqrt(1.0 - nDotV*nDotV);
+    v.y = 0.0;
+    v.z = nDotV;
+
+    float a = 0.0;
+    float b = 0.0;
+
+    vec3 n = vec3(0.0, 0.0, 1.0);
 
     const uint SAMPLE_COUNT = 1024;
-    float totalWeight = 0.0;
-    vec3 prefilteredColor = vec3(0.0);
-    for(uint i = 0; i < SAMPLE_COUNT; ++i)
+    for(uint i = 0u; i < SAMPLE_COUNT; ++i)
     {
         vec2 xi = hammersley(i, SAMPLE_COUNT);
         vec3 h  = importanceSampleGGX(xi, n, roughness);
         vec3 L  = normalize(2.0 * dot(v, h) * h - v);
 
-        float nDotL = max(dot(n, L), 0.0);
+        float nDotL = max(L.z, 0.0);
+        float nDotH = max(h.z, 0.0);
+        float vDotH = max(dot(v, h), 0.0);
+
         if(nDotL > 0.0)
         {
-            float d = distributionGGX(n, h, roughness);
-            float nDotH = max(dot(n, h), 0.0);
-            float hDotV = max(dot(h, v), 0.0);
-            float pdf = d * nDotH / (4.0 * hDotV) + 0.0001;
+            float g = geometrySmith(n, v, L, roughness);
+            float gVis = (g * vDotH) / (nDotH * nDotV);
+            float fc = pow(1.0 - vDotH, 5.0);
 
-            float resolution = environmentMapResolution;
-            float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
-            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
-            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
-
-            prefilteredColor += textureLod(environmentMap, L, mipLevel).rgb * nDotL;
-            totalWeight      += nDotL;
+            a += (1.0 - fc) * gVis;
+            b += fc * gVis;
         }
     }
-    prefilteredColor = prefilteredColor / totalWeight;
+    a /= float(SAMPLE_COUNT);
+    b /= float(SAMPLE_COUNT);
+    return vec2(a, b);
+}
 
-    fragColor = vec4(prefilteredColor, 1.0);
+void main()
+{
+    fragColor = integrateBRDF(texCoords.x, texCoords.y);
 }
 
 float radicalInverseVdc(uint bits)
@@ -89,15 +92,21 @@ vec3 importanceSampleGGX(vec2 xi, vec3 n, float roughness)
     return normalize(sampleVec);
 }
 
-float distributionGGX(vec3 n, vec3 h, float roughness) {
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float nDotH = max(dot(n, h), 0.0);
-    float nDotH2 = nDotH * nDotH;
+float geometrySchlickGGX(float nDotV, float roughness) {
+    float a = roughness;
+    float k = (a * a) / 2.0;
 
-    float numerator = a2;
-    float denominator = (nDotH2 * (a2 - 1.0) + 1.0);
-    denominator = PI * denominator * denominator;
+    float numerator = nDotV;
+    float denominator = nDotV * (1.0 - k ) + k;
 
     return numerator / denominator;
+}
+
+float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
+    float nDotV = max(dot(n, v), 0.0);
+    float nDotL = max(dot(n, l), 0.0);
+    float ggx1 = geometrySchlickGGX(nDotV, roughness);
+    float ggx2 = geometrySchlickGGX(nDotL, roughness);
+
+    return ggx1 * ggx2;
 }

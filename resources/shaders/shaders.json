@@ -31,5 +31,8 @@
   ],
   "prefilter": [
     "cubemap.vert", "prefilter.frag"
+  ],
+  "brdf": [
+    "brdf.vert", "brdf.frag"
   ]
 }

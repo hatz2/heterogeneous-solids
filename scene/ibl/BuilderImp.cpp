@@ -4,6 +4,7 @@
 
 #include "BuilderImp.h"
 #include <stb_image.h>
+#include <stb_image_write.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <spdlog/spdlog.h>
@@ -134,6 +135,54 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generatePrefilteredMap(const int size)
 
 hs::ibl::Builder& hs::ibl::BuilderImp::generateBrdfLUT(const int size)
 {
+    glGenTextures(1, &result.brdfLUT);
+
+    glBindTexture(GL_TEXTURE_2D, result.brdfLUT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, size, size, 0, GL_RG, GL_FLOAT, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.brdfLUT, 0);
+    glViewport(0, 0, size, size);
+
+    RenderContext renderContext(*shaderManager.get().requireShaderProgram("brdf"));
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // render quad
+    std::vector<glm::vec3> vertices = {
+        {-1.0f,  1.0f, 0.0f}, // 0
+        {-1.0f, -1.0f, 0.0f}, // 1
+        { 1.0f,  1.0f, 0.0f}, // 2
+        { 1.0f, -1.0f,  1.0f}, // 3
+    };
+
+    std::vector<unsigned int> indices = {
+        0, 1, 2,
+        1, 2, 3,
+    };
+
+    std::vector<glm::vec3> texCoords = {
+        {0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 1.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f}
+    };
+
+    Mesh quad;
+    quad.setVertices(vertices);
+    quad.setIndices(indices);
+    quad.setUVW(texCoords);
+
+    quad.render(renderContext);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
     return *this;
 }
 

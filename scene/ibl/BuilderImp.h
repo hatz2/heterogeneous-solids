@@ -21,7 +21,7 @@ namespace hs::ibl
 
         Builder& generateEnvironmentMap(const int size= 2048) override;
         Builder& generateIrradianceMap(const int size = 32) override;
-        Builder& generatePrefilteredMap(const int size) override;
+        Builder& generatePrefilteredMap(const int size = 128) override;
         Builder& generateBrdfLUT(const int size) override;
 
     private:
@@ -29,7 +29,7 @@ namespace hs::ibl
         void initMatrices();
         void initCube();
         void loadHdrTexture();
-        GLuint createEmptyCubeTexture(const int size) const;
+        GLuint createEmptyCubeTexture(const int size, bool lod = false) const;
 
         GLuint frameBuffer = 0;
         GLuint renderBuffer = 0;

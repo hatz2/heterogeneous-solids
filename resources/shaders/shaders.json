@@ -28,5 +28,8 @@
   ],
   "irradiance": [
     "cubemap.vert", "irradiance.frag"
+  ],
+  "prefilter": [
+    "cubemap.vert", "prefilter.frag"
   ]
 }

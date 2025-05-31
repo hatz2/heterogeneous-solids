@@ -15,6 +15,7 @@ namespace hs {
         iblData = ibl::BuilderImp("C:\\Users\\alext\\Documents\\TFM\\newport_loft.hdr", shaderManager)
                     .generateEnvironmentMap()
                     .generateIrradianceMap()
+                    .generatePrefilteredMap()
                     .getResult();
     }
 
@@ -195,7 +196,7 @@ namespace hs {
 
         renderContext.getUniform("environmentMap").set(0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.environmentMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.prefilteredMap);
 
         scene.getSkybox().render(renderContext);
 

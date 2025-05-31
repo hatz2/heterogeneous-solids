@@ -72,7 +72,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateIrradianceMap(const int size)
 
     glViewport(0, 0, size, size);
 
-    for (unsigned int i = 0; i < 6; ++i)
+    for (unsigned int i = 0; i < viewMatrices.size(); ++i)
     {
         renderContext.setViewMatrix(viewMatrices[i]);
 
@@ -89,6 +89,40 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateIrradianceMap(const int size)
 
 hs::ibl::Builder& hs::ibl::BuilderImp::generatePrefilteredMap(const int size)
 {
+    result.prefilteredMap = createEmptyCubeTexture(size, true);
+
+    RenderContext renderContext(*shaderManager.get().requireShaderProgram("prefilter"));
+    renderContext.setProjectionMatrix(projectionMatrix);
+    renderContext.getUniform("environmentMap").set(0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, result.environmentMap);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    int maxMipLevels = 5;
+
+    for (int mipLevel = 0; mipLevel < maxMipLevels; ++mipLevel)
+    {
+        const int mipSize = std::lround(size * std::pow(0.5, mipLevel));
+        glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipSize, mipSize);
+        glViewport(0, 0, mipSize, mipSize);
+
+        float roughness = (float)mipLevel / (float)(maxMipLevels - 1);
+        renderContext.getUniform("roughness").set(roughness);
+
+        for (unsigned int i = 0; i < viewMatrices.size(); ++i)
+        {
+            renderContext.setViewMatrix(viewMatrices[i]);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                                   result.prefilteredMap, mipLevel);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            cube.render(renderContext);
+        }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
     return *this;
 }
 
@@ -192,7 +226,7 @@ void hs::ibl::BuilderImp::loadHdrTexture()
     }
 }
 
-GLuint hs::ibl::BuilderImp::createEmptyCubeTexture(const int size) const
+GLuint hs::ibl::BuilderImp::createEmptyCubeTexture(const int size, bool lod) const
 {
     GLuint textureId;
     glGenTextures(1, &textureId);
@@ -207,8 +241,17 @@ GLuint hs::ibl::BuilderImp::createEmptyCubeTexture(const int size) const
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (lod)
+    {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
 
     return textureId;
 }

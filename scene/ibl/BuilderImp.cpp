@@ -31,7 +31,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateEnvironmentMap(const int size)
     glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
 
-    result.environmentMap = createEmptyCubeTexture(size);
+    result.environmentMap = createEmptyCubeTexture(size, true);
 
     RenderContext renderContext(*shaderManager.get().requireShaderProgram("cubemap"));
     renderContext.setProjectionMatrix(projectionMatrix);
@@ -52,6 +52,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateEnvironmentMap(const int size)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     return *this;
 }
@@ -91,9 +92,14 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generatePrefilteredMap(const int size)
 {
     result.prefilteredMap = createEmptyCubeTexture(size, true);
 
+    int environmentMapResolution;
+    glBindTexture(GL_TEXTURE_CUBE_MAP, result.environmentMap);
+    glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_WIDTH, &environmentMapResolution);
+
     RenderContext renderContext(*shaderManager.get().requireShaderProgram("prefilter"));
     renderContext.setProjectionMatrix(projectionMatrix);
     renderContext.getUniform("environmentMap").set(0);
+    renderContext.getUniform("environmentMapResolution").set(environmentMapResolution);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, result.environmentMap);
 

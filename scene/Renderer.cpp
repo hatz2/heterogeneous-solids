@@ -196,7 +196,7 @@ namespace hs {
 
         renderContext.getUniform("environmentMap").set(0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.prefilteredMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.environmentMap);
 
         scene.getSkybox().render(renderContext);
 

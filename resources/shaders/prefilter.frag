@@ -5,12 +5,14 @@ layout (location = 0) out vec4 fragColor;
 
 uniform samplerCube environmentMap;
 uniform float roughness;
+uniform float environmentMapResolution;
 
 const float PI = 3.14159265359;
 
 float radicalInverseVdc(uint bits);
 vec2 hammersley(uint i, uint N);
 vec3 importanceSampleGGX(vec2 xi, vec3 n, float roughness);
+float distributionGGX(vec3 n, vec3 h, float roughness);
 
 void main()
 {
@@ -18,10 +20,10 @@ void main()
     vec3 r = n;
     vec3 v = r;
 
-    const uint SAMPLE_COUNT = 1024u;
+    const uint SAMPLE_COUNT = 1024;
     float totalWeight = 0.0;
     vec3 prefilteredColor = vec3(0.0);
-    for(uint i = 0u; i < SAMPLE_COUNT; ++i)
+    for(uint i = 0; i < SAMPLE_COUNT; ++i)
     {
         vec2 xi = hammersley(i, SAMPLE_COUNT);
         vec3 h  = importanceSampleGGX(xi, n, roughness);
@@ -30,7 +32,17 @@ void main()
         float nDotL = max(dot(n, L), 0.0);
         if(nDotL > 0.0)
         {
-            prefilteredColor += texture(environmentMap, L).rgb * nDotL;
+            float d = distributionGGX(n, h, roughness);
+            float nDotH = max(dot(n, h), 0.0);
+            float hDotV = max(dot(h, v), 0.0);
+            float pdf = d * nDotH / (4.0 * hDotV) + 0.0001;
+
+            float resolution = environmentMapResolution;
+            float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
+            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
+            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+
+            prefilteredColor += textureLod(environmentMap, L, mipLevel).rgb * nDotL;
             totalWeight      += nDotL;
         }
     }
@@ -75,4 +87,17 @@ vec3 importanceSampleGGX(vec2 xi, vec3 n, float roughness)
 
     vec3 sampleVec = tangent * H.x + bitangent * H.y + n * H.z;
     return normalize(sampleVec);
+}
+
+float distributionGGX(vec3 n, vec3 h, float roughness) {
+    float a = roughness * roughness; // a = alpha so roughness is elevated by 2 here
+    float a2 = a * a;
+    float nDotH = max(dot(n, h), 0.0);
+    float nDotH2 = nDotH * nDotH;
+
+    float numerator = a2;
+    float denominator = (nDotH2 * (a2 - 1.0) + 1.0);
+    denominator = PI * denominator * denominator;
+
+    return numerator / denominator;
 }

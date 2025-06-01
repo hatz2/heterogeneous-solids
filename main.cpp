@@ -194,6 +194,7 @@ void configImGui(GLFWmonitor* monitor, GLFWwindow* window, hs::Resources& resour
 
 // Main code
 int main(int argc, const char** argv) {
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     hs::logging::setupLogging();
     hs::Resources resources(argv[0]);
 
@@ -230,7 +231,6 @@ int main(int argc, const char** argv) {
     if (window == nullptr || glewInit() != GLEW_OK) return 1;
 
     configImGui(monitor, window, resources, glsl_version);
-
     hs::App app(window, resources);
 
     ImGuiIO& io = ImGui::GetIO();

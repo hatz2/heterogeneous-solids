@@ -1,4 +1,7 @@
 uniform samplerCube irradianceMap;
+uniform samplerCube prefilteredMap;
+uniform sampler2D brdfLUT;
+uniform mat4 viewMatrix;
 
 vec3 pbrAmbientLight(Material material, Light light);
 vec3 pbrPointLight(Material material, Light light);
@@ -81,21 +84,31 @@ float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
 vec3 iblAmbientLight(Material material) {
     vec3 n = normalize(normal);
     vec3 v = normalize(-position);
+    vec3 r = reflect(-v, n);
+    r = mat3(inverse(viewMatrix)) * r;
 
-    vec3 materialColor = material.kD;
+    vec3 materialColor = toLinear(material.kD);
     float metallic = material.metallic;
     float roughness = material.roughness;
 
     vec3 f0 = vec3(0.04);
     f0 = mix(f0, materialColor, metallic);
 
-    vec3 ks = fresnelSchlick(max(dot(n, v), 0.0), f0);
-    //vec3 ks = fresnelSchlickRoughness(max(dot(n, v), 0.0), f0, roughness);
+    //vec3 ks = fresnelSchlick(max(dot(n, v), 0.0), f0); // no ibl
+    vec3 f = fresnelSchlickRoughness(max(dot(n, v), 0.0), f0, roughness);
+    vec3 ks = f;
     vec3 kd = 1.0 - ks;
-    vec3 irradiance = texture(irradianceMap, n).rgb;
-    vec3 diffuse = irradiance * toLinear(materialColor);
+    kd *= 1.0 - metallic;
 
-    return (kd * diffuse);
+    vec3 irradiance = texture(irradianceMap, n).rgb;
+    vec3 diffuse = irradiance * materialColor;
+
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(prefilteredMap, r, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(brdfLUT, vec2(max(dot(n, v), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (f * brdf.x + brdf.y);
+
+    return (kd * diffuse + specular);
 }
 
 vec3 pbrAmbientLight(Material material, Light light) {

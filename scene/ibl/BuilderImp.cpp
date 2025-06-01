@@ -51,9 +51,11 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateEnvironmentMap(const int size)
         cube.render(renderContext);
     }
 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, result.environmentMap);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     return *this;
 }

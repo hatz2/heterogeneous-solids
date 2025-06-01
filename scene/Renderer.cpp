@@ -12,10 +12,10 @@
 
 namespace hs {
     Renderer::Renderer(ShaderManager& shaderManager) : shaderManager(shaderManager) {
-        iblData = ibl::BuilderImp("C:\\Users\\alext\\Documents\\TFM\\newport_loft.hdr", shaderManager)
+        iblData = ibl::BuilderImp("C:\\Users\\alext\\Documents\\TFM\\816-hdri-skies-com.hdr", shaderManager)
                     .generateEnvironmentMap()
                     .generateIrradianceMap()
-                    .generatePrefilteredMap()
+                    .generatePrefilteredMap(512)
                     .generateBrdfLUT()
                     .getResult();
     }
@@ -78,7 +78,6 @@ namespace hs {
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
         if (profile.isAntialiasing()) glEnable(GL_MULTISAMPLE);
         else glDisable(GL_MULTISAMPLE);
@@ -216,8 +215,14 @@ namespace hs {
         renderContext.setDetailedRendering(profile.isDetailedSurfaces());
         renderContext.getUniform("usePbr").set(profile.isUsePbr());
         renderContext.getUniform("irradianceMap").set(0);
+        renderContext.getUniform("prefilteredMap").set(1);
+        renderContext.getUniform("brdfLUT").set(2);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.irradianceMap);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.prefilteredMap);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, iblData.brdfLUT);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         auto lights = scene.getLights().getCompiledLights();

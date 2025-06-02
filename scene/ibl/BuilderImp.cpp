@@ -34,7 +34,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateEnvironmentMap(const int size)
 
     result.environmentMap = createEmptyCubeTexture(size, true);
 
-    RenderContext renderContext(*shaderManager.get().requireShaderProgram("cubemap"));
+    RenderContext renderContext(*shaderManager.get().requireShaderProgram("environment_map"));
     renderContext.setProjectionMatrix(projectionMatrix);
     renderContext.getUniform("equirectangularMap").set(0);
     glActiveTexture(GL_TEXTURE0);
@@ -68,7 +68,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateIrradianceMap(const int size)
 
     result.irradianceMap = createEmptyCubeTexture(size);
 
-    RenderContext renderContext(*shaderManager.get().requireShaderProgram("irradiance"));
+    RenderContext renderContext(*shaderManager.get().requireShaderProgram("irradiance_map"));
     renderContext.setProjectionMatrix(projectionMatrix);
     renderContext.getUniform("environmentMap").set(0);
     glActiveTexture(GL_TEXTURE0);
@@ -99,7 +99,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generatePrefilteredMap(const int size)
     glBindTexture(GL_TEXTURE_CUBE_MAP, result.environmentMap);
     glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_WIDTH, &environmentMapResolution);
 
-    RenderContext renderContext(*shaderManager.get().requireShaderProgram("prefilter"));
+    RenderContext renderContext(*shaderManager.get().requireShaderProgram("prefilter_map"));
     renderContext.setProjectionMatrix(projectionMatrix);
     renderContext.getUniform("environmentMap").set(0);
     renderContext.getUniform("environmentMapResolution").set(environmentMapResolution);
@@ -152,7 +152,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateBrdfLUT(const int size)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.brdfLUT, 0);
     glViewport(0, 0, size, size);
 
-    RenderContext renderContext(*shaderManager.get().requireShaderProgram("brdf"));
+    RenderContext renderContext(*shaderManager.get().requireShaderProgram("brdf_lut"));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render quad

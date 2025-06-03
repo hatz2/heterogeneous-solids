@@ -22,11 +22,15 @@ namespace hs {
 
         std::unique_ptr<SelectionController> renderColorSelection(const RenderProfile& profile, const Scene& scene);
         void render(const RenderProfile& profile, const Scene& scene);
+
+        [[nodiscard]] const std::vector<ibl::Data>& getEnvMaps() const;
+        void loadEnvMap(const std::string& path);
     private:
         // GIZMOS
         Grid grid;
 
-        // CUBEMAP
+        // IBL
+        std::vector<ibl::Data> envMaps;
         ibl::Data iblData;
 
         // RESOURCES

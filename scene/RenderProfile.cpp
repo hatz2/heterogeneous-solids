@@ -36,8 +36,10 @@ namespace hs {
 
         antialiasing(true),
 
-        usePbr(true),
-        showSkybox(true)
+        usePbr(false),
+        showSkybox(false),
+        useIbl(false),
+        selectedEnvMap(0)
     {
         // TODO: Put back default parameters that have been changed
     }
@@ -228,5 +230,25 @@ namespace hs {
     void RenderProfile::setShowSkybox(bool showSkybox)
     {
         this->showSkybox = showSkybox;
+    }
+
+    bool RenderProfile::isUseIbl() const
+    {
+        return useIbl;
+    }
+
+    void RenderProfile::setUseIbl(bool useIbl)
+    {
+        this->useIbl = useIbl;
+    }
+
+    unsigned int RenderProfile::getSelectedEnvMap() const
+    {
+        return selectedEnvMap;
+    }
+
+    void RenderProfile::setSelectedEnvMap(const unsigned int index)
+    {
+        this->selectedEnvMap = index;
     }
 } // hs

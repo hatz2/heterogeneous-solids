@@ -43,6 +43,8 @@ namespace hs {
 
         bool usePbr;
         bool showSkybox;
+        bool useIbl;
+        unsigned int selectedEnvMap;
     public:
         RenderProfile();
 
@@ -114,6 +116,12 @@ namespace hs {
 
         [[nodiscard]] bool isShowSkybox() const;
         void setShowSkybox(bool showSkybox);
+
+        [[nodiscard]] bool isUseIbl() const;
+        void setUseIbl(bool useIbl);
+
+        [[nodiscard]] unsigned int getSelectedEnvMap() const;
+        void setSelectedEnvMap(const unsigned int index);
     };
 
 } // hs

@@ -101,12 +101,48 @@ namespace hs {
             if (ImGui::Checkbox("Show lights", &showLights))
                 profile.setShowLightsGizmo(showLights);
         }
-        if (ImGui::CollapsingHeader("PBR", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("Physically Based Render", ImGuiTreeNodeFlags_DefaultOpen))
         {
             bool usePbr = profile.isUsePbr();
             if (ImGui::Checkbox("Use PBR", &usePbr))
             {
                 profile.setUsePbr(usePbr);
+            }
+
+            ImGui::SeparatorText("Image Based Lighting");
+
+            bool useIbl = profile.isUseIbl();
+            if (ImGui::Checkbox("Use IBL", &useIbl))
+            {
+                profile.setUseIbl(useIbl);
+            }
+
+            bool showSkybox = profile.isShowSkybox();
+            if (ImGui::Checkbox("Show skybox", &showSkybox))
+            {
+                profile.setShowSkybox(showSkybox);
+            }
+
+            ImGui::SeparatorText("Environment maps");
+
+            auto& renderer = context.getRenderer();
+            const auto& envMaps = renderer.getEnvMaps();
+            for (unsigned int i = 0; i < envMaps.size(); ++i)
+            {
+                if (ImGui::RadioButton(envMaps[i].fileName.c_str(), profile.getSelectedEnvMap() == i))
+                {
+                    profile.setSelectedEnvMap(i);
+                }
+            }
+
+            if (ImGui::Button("Load Environment Map"))
+            {
+                if (auto result = context.getIO().getDialogsFacade().openFile(
+                    "Open HDR environment map", ".", {{ "HDR", "*.hdr"}}
+                    ))
+                {
+                    renderer.loadEnvMap(result.value());
+                }
             }
         }
         if (ImGui::CollapsingHeader("Other", ImGuiTreeNodeFlags_DefaultOpen)) {

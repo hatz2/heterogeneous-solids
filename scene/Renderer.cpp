@@ -12,12 +12,7 @@
 
 namespace hs {
     Renderer::Renderer(ShaderManager& shaderManager) : shaderManager(shaderManager) {
-        iblData = ibl::BuilderImp("C:\\Users\\alext\\Documents\\TFM\\816-hdri-skies-com.hdr", shaderManager)
-                    .generateEnvironmentMap()
-                    .generateIrradianceMap()
-                    .generatePrefilteredMap(512)
-                    .generateBrdfLUT()
-                    .getResult();
+
     }
 
     std::unique_ptr<SelectionController> Renderer::renderColorSelection(const RenderProfile& profile, const Scene& scene) {
@@ -78,6 +73,7 @@ namespace hs {
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
         if (profile.isAntialiasing()) glEnable(GL_MULTISAMPLE);
         else glDisable(GL_MULTISAMPLE);
@@ -100,6 +96,23 @@ namespace hs {
         renderSkybox(profile, scene);
 
         glDisable(GL_BLEND);
+    }
+
+    const std::vector<ibl::Data>& Renderer::getEnvMaps() const
+    {
+        return envMaps;
+    }
+
+    void Renderer::loadEnvMap(const std::string& path)
+    {
+        ibl::Data result = ibl::BuilderImp(path, shaderManager)
+            .generateEnvironmentMap()
+            .generateIrradianceMap()
+            .generatePrefilteredMap(512)
+            .generateBrdfLUT()
+            .getResult();
+
+        envMaps.push_back(result);
     }
 
     void Renderer::renderObjects(const RenderProfile& profile, const Scene& scene) {
@@ -186,6 +199,9 @@ namespace hs {
         if (!profile.isShowSkybox())
             return;
 
+        if (envMaps.empty())
+            return;
+
         GLboolean depthMask;
         glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
         glDepthMask(GL_FALSE);
@@ -196,7 +212,7 @@ namespace hs {
 
         renderContext.getUniform("environmentMap").set(0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.environmentMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, envMaps[profile.getSelectedEnvMap()].environmentMap);
 
         scene.getSkybox().render(renderContext);
 
@@ -214,15 +230,22 @@ namespace hs {
         renderContext.setRenderMode(RenderMode::Surfaces);
         renderContext.setDetailedRendering(profile.isDetailedSurfaces());
         renderContext.getUniform("usePbr").set(profile.isUsePbr());
+        renderContext.getUniform("useIbl").set(profile.isUseIbl());
         renderContext.getUniform("irradianceMap").set(0);
         renderContext.getUniform("prefilteredMap").set(1);
         renderContext.getUniform("brdfLUT").set(2);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.irradianceMap);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, iblData.prefilteredMap);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, iblData.brdfLUT);
+
+        if (!envMaps.empty())
+        {
+            auto data = envMaps[profile.getSelectedEnvMap()];
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, data.irradianceMap);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, data.prefilteredMap);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, data.brdfLUT);
+        }
+
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         auto lights = scene.getLights().getCompiledLights();

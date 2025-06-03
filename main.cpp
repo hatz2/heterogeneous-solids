@@ -194,7 +194,6 @@ void configImGui(GLFWmonitor* monitor, GLFWwindow* window, hs::Resources& resour
 
 // Main code
 int main(int argc, const char** argv) {
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     hs::logging::setupLogging();
     hs::Resources resources(argv[0]);
 

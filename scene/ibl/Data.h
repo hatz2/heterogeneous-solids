@@ -6,11 +6,13 @@
 #define DATA_H
 
 #include <GL/glew.h>
+#include <string>
 
 namespace hs::ibl
 {
     struct Data
     {
+        std::string fileName;
         GLuint environmentMap = 0;
         GLuint irradianceMap = 0;
         GLuint prefilteredMap = 0;

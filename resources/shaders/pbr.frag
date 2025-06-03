@@ -23,9 +23,14 @@ vec3 pbrLighting(Material material) {
 
         else if (light.type == point_light)
             result += pbrPointLight(material, light);
+
+        else if (!useIbl) {
+            result += pbrAmbientLight(material, light);
+        }
     }
 
-    result += iblAmbientLight(material);
+    if (useIbl)
+        result += iblAmbientLight(material);
 
     result = result / (result + vec3(1.0));
     result = toSRGB(result);

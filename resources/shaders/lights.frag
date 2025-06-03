@@ -7,7 +7,7 @@ const int directional_light = 2;
 const int spot_light = 3;
 
 uniform bool usePbr;
-// TODO: Add useIbl var
+uniform bool useIbl;
 uniform uint numLights;
 
 uniform struct Light {

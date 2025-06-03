@@ -4,10 +4,10 @@
 
 #include "BuilderImp.h"
 #include <stb_image.h>
-#include <stb_image_write.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <spdlog/spdlog.h>
+#include <filesystem>
 
 #include "../RenderContext.h"
 
@@ -39,6 +39,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateEnvironmentMap(const int size)
     renderContext.getUniform("equirectangularMap").set(0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, hdrTexture);
+    glDisable(GL_CULL_FACE);
 
     glViewport(0, 0, size, size);
 
@@ -76,6 +77,8 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateIrradianceMap(const int size)
 
     glViewport(0, 0, size, size);
 
+    glDisable(GL_CULL_FACE);
+
     for (unsigned int i = 0; i < viewMatrices.size(); ++i)
     {
         renderContext.setViewMatrix(viewMatrices[i]);
@@ -107,6 +110,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generatePrefilteredMap(const int size)
     glBindTexture(GL_TEXTURE_CUBE_MAP, result.environmentMap);
 
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glDisable(GL_CULL_FACE);
     int maxMipLevels = 5;
 
     for (int mipLevel = 0; mipLevel < maxMipLevels; ++mipLevel)
@@ -180,6 +184,7 @@ hs::ibl::Builder& hs::ibl::BuilderImp::generateBrdfLUT(const int size)
     quad.setIndices(indices);
     quad.setUVW(texCoords);
 
+    glDisable(GL_CULL_FACE);
     quad.render(renderContext);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -276,6 +281,8 @@ void hs::ibl::BuilderImp::loadHdrTexture()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(imageData);
+
+        result.fileName = std::filesystem::path(hdrTexturePath).stem().string();
     }
     else
     {

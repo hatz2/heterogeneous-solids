@@ -108,7 +108,7 @@ namespace hs {
         ibl::Data result = ibl::BuilderImp(path, shaderManager)
             .generateEnvironmentMap()
             .generateIrradianceMap()
-            .generatePrefilteredMap(512)
+            .generatePrefilteredMap()
             .generateBrdfLUT()
             .getResult();
 

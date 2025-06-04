@@ -21,7 +21,7 @@ namespace hs::ibl
 
         Builder& generateEnvironmentMap(const int size= 2048) override;
         Builder& generateIrradianceMap(const int size = 32) override;
-        Builder& generatePrefilteredMap(const int size = 128) override;
+        Builder& generatePrefilteredMap(const int size = 2048) override;
         Builder& generateBrdfLUT(const int size = 512) override;
 
     private:

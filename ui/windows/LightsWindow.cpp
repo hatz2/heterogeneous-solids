@@ -30,6 +30,7 @@ namespace hs {
             ImGui::EndMenuBar();
         }
 
+        ImGui::BeginDisabled(context.getRenderProfile().isUseIbl() && context.getRenderProfile().isUsePbr());
         bool ambientEnabled = lights.getAmbientLight().isEnabled();
         ImGui::BeginDisabled(!ambientEnabled);
         auto ambient = lights.getAmbientLight().getLightProps().getIA();
@@ -42,6 +43,7 @@ namespace hs {
             lights.getAmbientLight().setEnabled(ambientEnabled);
             lights.compile();
         }
+        ImGui::EndDisabled();
         int item_current = !lights.getModelingLight().isEnabled();
         if (ImGui::Combo("Light Sources", &item_current, "Modeling\0Custom\0")) {
             lights.getModelingLight().setEnabled(!((bool)item_current));
@@ -55,10 +57,10 @@ namespace hs {
                 positionalLightProps(context.getScene().getLights().getModelingLight().getLightProps());
                 ImGui::EndDisabled();
                 ImGui::Separator();
-                commonLightProps(context.getScene().getLights().getModelingLight().getLightProps());
+                commonLightProps(context.getScene().getLights().getModelingLight().getLightProps(), context);
                 break;
             case 1:
-                customLightsTable(lights);
+                customLightsTable(lights, context);
                 break;
             default:
                 break;
@@ -97,14 +99,16 @@ namespace hs {
         }
     }
 
-    void LightsWindow::commonLightProps(LightProps& lightProps) {
+    void LightsWindow::commonLightProps(LightProps& lightProps, const Context& context) {
         auto diffuse = lightProps.getID();
         if (ImGui::ColorEdit3("Diffuse", glm::value_ptr(diffuse)))
             lightProps.setID(diffuse);
 
+        ImGui::BeginDisabled(context.getRenderProfile().isUsePbr());
         auto specular = lightProps.getIS();
         if (ImGui::ColorEdit3("Specular", glm::value_ptr(specular)))
             lightProps.setIS(specular);
+        ImGui::EndDisabled();
 
         ImGui::PushItemWidth(65);
         float gamma = lightProps.getGamma();
@@ -122,7 +126,7 @@ namespace hs {
             lightProps.setLookAt(lookAt);
     }
 
-    void LightsWindow::customLightsTable(LightSet& lights) {
+    void LightsWindow::customLightsTable(LightSet& lights, const Context& context) {
         ImGui::SeparatorText("Custom lights settings");
         static ImGuiTableFlags flags = ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Resizable;
         const int selectedLightId = lights.getEditingLight();
@@ -169,7 +173,7 @@ namespace hs {
             ImGui::Separator();
             positionalLightProps(light.getLightProps());
             ImGui::Separator();
-            commonLightProps(light.getLightProps());
+            commonLightProps(light.getLightProps(), context);
             ImGui::Separator();
             if (ImGui::Button("Clone Light")) {
                 lights.getCustomLights().push_back(light);

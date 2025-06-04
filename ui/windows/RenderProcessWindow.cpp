@@ -112,16 +112,20 @@ namespace hs {
             ImGui::SeparatorText("Image Based Lighting");
 
             bool useIbl = profile.isUseIbl();
+            ImGui::BeginDisabled(!usePbr);
             if (ImGui::Checkbox("Use IBL", &useIbl))
             {
                 profile.setUseIbl(useIbl);
             }
+            ImGui::EndDisabled();
 
+            ImGui::BeginDisabled(context.getRenderer().getEnvMaps().empty());
             bool showSkybox = profile.isShowSkybox();
             if (ImGui::Checkbox("Show skybox", &showSkybox))
             {
                 profile.setShowSkybox(showSkybox);
             }
+            ImGui::EndDisabled();
 
             ImGui::SeparatorText("Environment maps");
 

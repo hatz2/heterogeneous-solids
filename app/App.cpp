@@ -53,6 +53,10 @@ namespace hs {
         menuFile->addItem(std::make_unique<MenuItem>(ICON_MD_FILE_OPEN " Open...", [this]() {
             openDocument();
         }));
+        menuFile->addItem(std::make_unique<MenuItem>(ICON_MD_FILE_OPEN " Open HDRI Map", [this]()
+        {
+            openEnvironmentMap();
+        }));
         menuFile->addSeparator();
         menuFile->addItem(std::make_unique<ConditionalMenuItem>(ICON_MD_SAVE " Save", [this]() {
             saveDocument();
@@ -132,6 +136,16 @@ namespace hs {
             context->setDocument(std::make_unique<FileDocument>(path.string(), *serializer->second, *context));
             if (auto document = context->getDocument())
                 document->get().load();
+        }
+    }
+
+    void App::openEnvironmentMap()
+    {
+        if (auto result = io->getDialogsFacade().openFile(
+    "Open HDR environment map", ".", {{ "HDR", "*.hdr"}}
+        ))
+        {
+            contextManager->borrowContext()->getRenderer().loadEnvMap(result.value());
         }
     }
 

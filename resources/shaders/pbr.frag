@@ -1,3 +1,8 @@
+uniform samplerCube irradianceMap;
+uniform samplerCube prefilteredMap;
+uniform sampler2D brdfLUT;
+uniform mat4 viewMatrix;
+
 vec3 pbrAmbientLight(Material material, Light light);
 vec3 pbrPointLight(Material material, Light light);
 vec3 pbrDirectionalLight(Material material, Light light);
@@ -10,10 +15,7 @@ vec3 pbrLighting(Material material) {
     for (uint i = 0; i < numLights; ++i) {
         Light light = lights[i];
 
-        if (light.type == ambient_light)
-            result += pbrAmbientLight(material, light);
-
-        else if (light.type == directional_light)
+        if (light.type == directional_light)
             result += pbrDirectionalLight(material, light);
 
         else if (light.type == spot_light)
@@ -22,7 +24,13 @@ vec3 pbrLighting(Material material) {
         else if (light.type == point_light)
             result += pbrPointLight(material, light);
 
+        else if (!useIbl) {
+            result += pbrAmbientLight(material, light);
+        }
     }
+
+    if (useIbl)
+        result += iblAmbientLight(material);
 
     result = result / (result + vec3(1.0));
     result = toSRGB(result);
@@ -30,46 +38,34 @@ vec3 pbrLighting(Material material) {
     return result;
 }
 
+vec3 iblAmbientLight(Material material) {
+    vec3 n = normalize(normal);
+    vec3 v = normalize(-position);
+    vec3 r = reflect(-v, n);
+    r = mat3(inverse(viewMatrix)) * r;
 
-vec3 fresnelSchlick(float cosTheta, vec3 f0) {
-    return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    vec3 materialColor = toLinear(material.kD);
+    float metallic = material.metallic;
+    float roughness = material.roughness;
+
+    vec3 f0 = vec3(0.04);
+    f0 = mix(f0, materialColor, metallic);
+
+    vec3 f = fresnelSchlickRoughness(max(dot(n, v), 0.0), f0, roughness);
+    vec3 ks = f;
+    vec3 kd = 1.0 - ks;
+    kd *= 1.0 - metallic;
+
+    vec3 irradiance = texture(irradianceMap, n).rgb;
+    vec3 diffuse = irradiance * materialColor;
+
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(prefilteredMap, r, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(brdfLUT, vec2(max(dot(n, v), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (f * brdf.x + brdf.y);
+
+    return (kd * diffuse + specular);
 }
-
-
-float distributionGGX(vec3 n, vec3 h, float roughness) {
-    float a = roughness * roughness; // a = alpha so roughness is elevated by 2 here
-    float a2 = a * a;
-    float nDotH = max(dot(n, h), 0.0);
-    float nDotH2 = nDotH * nDotH;
-
-    float numerator = a2;
-    float denominator = (nDotH2 * (a2 - 1.0) + 1.0);
-    denominator = M_PI * denominator * denominator;
-
-    return numerator / denominator;
-}
-
-
-float geometrySchlickGGX(float nDotV, float roughness) {
-    float r = (roughness + 1.0);
-    float k = (r * r) / 8.0; // TODO: Remapping for IBL
-
-    float numerator = nDotV;
-    float denominator = nDotV * (1.0 - k ) + k;
-
-    return numerator / denominator;
-}
-
-
-float geometrySmith(vec3 n, vec3 v, vec3 l, float roughness) {
-    float nDotV = max(dot(n, v), 0.0);
-    float nDotL = max(dot(n, l), 0.0);
-    float ggx1 = geometrySchlickGGX(nDotV, roughness);
-    float ggx2 = geometrySchlickGGX(nDotL, roughness);
-
-    return ggx1 * ggx2;
-}
-
 
 vec3 pbrAmbientLight(Material material, Light light) {
     return toLinear(light.iA) * toLinear(material.kA);

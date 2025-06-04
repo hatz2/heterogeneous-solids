@@ -1,6 +1,6 @@
 {
   "surface": [
-    "surface.vert", "surface.frag", "lights.frag", "pbr.frag", "perlin.frag", "materials.frag"
+    "surface.vert", "surface.frag", "lights.frag", "pbr_equations.frag", "pbr.frag", "perlin.frag", "materials.frag"
   ],
   "line": [
     "line.vert", "frag_color.frag"
@@ -19,5 +19,20 @@
   ],
   "light_gizmo": [
     "light_gizmo.vert", "frag_color.frag"
+  ],
+  "skybox": [
+    "skybox.vert", "skybox.frag"
+  ],
+  "environment_map": [
+    "environment_map.vert", "environment_map.frag"
+  ],
+  "irradiance_map": [
+    "environment_map.vert", "irradiance_map.frag"
+  ],
+  "prefilter_map": [
+    "environment_map.vert", "prefilter_map.frag", "ibl_equations.frag"
+  ],
+  "brdf_lut": [
+    "brdf_lut.vert", "brdf_lut.frag", "ibl_equations.frag"
   ]
 }

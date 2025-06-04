@@ -1,3 +1,7 @@
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image.h>
+#include <stb_image_write.h>
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "bindings/imgui_impl_glfw.h"
@@ -226,7 +230,6 @@ int main(int argc, const char** argv) {
     if (window == nullptr || glewInit() != GLEW_OK) return 1;
 
     configImGui(monitor, window, resources, glsl_version);
-
     hs::App app(window, resources);
 
     ImGuiIO& io = ImGui::GetIO();

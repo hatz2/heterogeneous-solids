@@ -7,6 +7,7 @@ const int directional_light = 2;
 const int spot_light = 3;
 
 uniform bool usePbr;
+uniform bool useIbl;
 uniform uint numLights;
 
 uniform struct Light {
@@ -27,6 +28,7 @@ vec3 defaultAmbientLight(Material material, Light light);
 vec3 defaultPointLight(Material material, Light light);
 vec3 defaultDirectionalLight(Material material, Light light);
 vec3 defaultSpotLight(Material material, Light light);
+vec3 iblAmbientLight(Material material);
 
 vec3 pbrLighting(Material material);
 vec3 defaultLighting(Material material);

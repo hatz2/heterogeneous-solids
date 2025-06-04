@@ -2,10 +2,13 @@
 // Created by Alberto Elorza Rubio on 28/11/2023.
 //
 
+#include <filesystem>
 #include "Renderer.h"
 #include "gizmos/LightGizmo.h"
 
-#include <utility>
+#include <iostream>
+
+#include "ibl/BuilderImp.h"
 
 namespace hs {
     Renderer::Renderer(ShaderManager& shaderManager) : shaderManager(shaderManager) {
@@ -70,6 +73,7 @@ namespace hs {
         glEnable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
         if (profile.isAntialiasing()) glEnable(GL_MULTISAMPLE);
         else glDisable(GL_MULTISAMPLE);
@@ -89,7 +93,26 @@ namespace hs {
 
         renderGizmos(profile, scene);
 
+        renderSkybox(profile, scene);
+
         glDisable(GL_BLEND);
+    }
+
+    const std::vector<ibl::Data>& Renderer::getEnvMaps() const
+    {
+        return envMaps;
+    }
+
+    void Renderer::loadEnvMap(const std::string& path)
+    {
+        ibl::Data result = ibl::BuilderImp(path, shaderManager)
+            .generateEnvironmentMap()
+            .generateIrradianceMap()
+            .generatePrefilteredMap()
+            .generateBrdfLUT()
+            .getResult();
+
+        envMaps.push_back(result);
     }
 
     void Renderer::renderObjects(const RenderProfile& profile, const Scene& scene) {
@@ -171,6 +194,31 @@ namespace hs {
         }
     }
 
+    void Renderer::renderSkybox(const RenderProfile& profile, const Scene& scene)
+    {
+        if (!profile.isShowSkybox())
+            return;
+
+        if (envMaps.empty())
+            return;
+
+        GLboolean depthMask;
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
+        glDepthMask(GL_FALSE);
+
+        RenderContext renderContext(*shaderManager.requireShaderProgram("skybox"));
+        renderContext.setViewMatrix(scene.getCamera().view());
+        renderContext.setProjectionMatrix(scene.getCamera().projection());
+
+        renderContext.getUniform("environmentMap").set(0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, envMaps[profile.getSelectedEnvMap()].environmentMap);
+
+        scene.getSkybox().render(renderContext);
+
+        glDepthMask(depthMask);
+    }
+
     void Renderer::renderSurfaces(const RenderProfile& profile, const Scene &scene) {
         if (!profile.isShowSurfaces()) return;
 
@@ -182,6 +230,22 @@ namespace hs {
         renderContext.setRenderMode(RenderMode::Surfaces);
         renderContext.setDetailedRendering(profile.isDetailedSurfaces());
         renderContext.getUniform("usePbr").set(profile.isUsePbr());
+        renderContext.getUniform("useIbl").set(profile.isUseIbl());
+        renderContext.getUniform("irradianceMap").set(0);
+        renderContext.getUniform("prefilteredMap").set(1);
+        renderContext.getUniform("brdfLUT").set(2);
+
+        if (!envMaps.empty())
+        {
+            auto data = envMaps[profile.getSelectedEnvMap()];
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, data.irradianceMap);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, data.prefilteredMap);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, data.brdfLUT);
+        }
+
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         auto lights = scene.getLights().getCompiledLights();
@@ -194,18 +258,6 @@ namespace hs {
         }
 
         scene.getRoot().getRenderer()(renderContext);
-
-
-        // auto it = scene.getLights().begin();
-        // if (it < scene.getLights().end()) {
-        //     it->get().apply(renderContext);
-        //     scene.getRoot().getRenderer()(renderContext);
-        //     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-        //     for (; it < scene.getLights().end(); it++) {
-        //         it->get().apply(renderContext);
-        //         scene.getRoot().getRenderer()(renderContext);
-        //     }
-        // }
     }
 
     void Renderer::renderLines(const RenderProfile& profile, const Scene& scene, bool selection) {

@@ -12,6 +12,7 @@
 #include "../shaders/ShaderManager.h"
 #include "gizmos/Grid.h"
 #include "RenderProfile.h"
+#include "ibl/Builder.h"
 
 namespace hs {
 
@@ -21,15 +22,23 @@ namespace hs {
 
         std::unique_ptr<SelectionController> renderColorSelection(const RenderProfile& profile, const Scene& scene);
         void render(const RenderProfile& profile, const Scene& scene);
+
+        [[nodiscard]] const std::vector<ibl::Data>& getEnvMaps() const;
+        void loadEnvMap(const std::string& path);
     private:
         // GIZMOS
         Grid grid;
+
+        // IBL
+        std::vector<ibl::Data> envMaps;
+        ibl::Data iblData;
 
         // RESOURCES
         ShaderManager& shaderManager;
 
         void renderObjects(const RenderProfile& profile, const Scene& scene);
         void renderGizmos(const RenderProfile& profile, const Scene& scene);
+        void renderSkybox(const RenderProfile& profile, const Scene& scene);
 
         void renderSurfaces(const RenderProfile& profile, const Scene& scene);
         void renderLines(const RenderProfile& profile, const Scene& scene, bool selection = false);

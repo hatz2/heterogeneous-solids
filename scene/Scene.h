@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "objects/GroupNode.h"
 #include "../shaders/ShaderProgram.h"
+#include "drawables/Mesh.h"
 #include "lights/LightSet.h"
 
 namespace hs {
@@ -20,15 +21,18 @@ namespace hs {
         [[nodiscard]] Camera& getCamera() const;
         [[nodiscard]] GroupNode& getRoot() const;
         [[nodiscard]] LightSet& getLights() const;
+        [[nodiscard]] Mesh& getSkybox() const;
 
         void setSelectedObject(SceneNode& object);
         void unsetSelectedObject();
         [[nodiscard]] SceneNode& getSelectedObject() const;
     private:
+        void initSkybox();
         // OBJECTS
         std::unique_ptr<Camera> camera;
         std::unique_ptr<GroupNode> root;
         std::unique_ptr<LightSet> lights;
+        std::unique_ptr<Mesh> skybox;
 
         // BEHAVIOUR
         std::reference_wrapper<SceneNode> selectedObject;

@@ -16,9 +16,9 @@ namespace hs {
     protected:
         void renderBody(const Context&) override;
     private:
-        static void commonLightProps(LightProps&);
+        static void commonLightProps(LightProps& lightProps, const Context& context);
         static void positionalLightProps(LightProps&);
-        static void customLightsTable(LightSet&);
+        static void customLightsTable(LightSet& lights, const Context& context);
 
         std::shared_ptr<Dialog> lightDialog;
     };

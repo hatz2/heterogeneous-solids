@@ -11,7 +11,7 @@
 namespace hs {
     Camera::Camera() :
         aspect(1),
-        fovY(120), zNearPerspective(0.01), zFarPerspective(150),
+        fovY(90), zNearPerspective(0.01), zFarPerspective(150),
         width(12), height(12), zNearParallel(-100), zFarParallel(150),
         position({0, 2, 5}), lookAt(0), up({0, 1, 0}),
         mode(CameraMode::Perspective)

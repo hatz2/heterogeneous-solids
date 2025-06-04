@@ -13,6 +13,7 @@ find_package(lodepng REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(assimp REQUIRED)
+find_package(stb REQUIRED)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/ImGuizmo)
 
@@ -328,6 +329,10 @@ add_executable(heterogeneous_solids
         heterogeneous_solids/coefs/PositionCoef.h
         command/basic/SetCoefContinuityCommand.cpp
         command/basic/SetCoefContinuityCommand.h
+        scene/ibl/Builder.h
+        scene/ibl/Data.h
+        scene/ibl/BuilderImp.cpp
+        scene/ibl/BuilderImp.h
 )
 
 target_compile_definitions(heterogeneous_solids PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
@@ -340,3 +345,4 @@ target_link_libraries(heterogeneous_solids nlohmann_json::nlohmann_json)
 target_link_libraries(heterogeneous_solids spdlog::spdlog)
 target_link_libraries(heterogeneous_solids assimp::assimp)
 target_link_libraries(heterogeneous_solids ImGuizmo)
+target_link_libraries(heterogeneous_solids stb::stb)

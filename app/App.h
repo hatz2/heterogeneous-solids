@@ -46,6 +46,7 @@ namespace hs {
 
         void saveDocument(bool asNew = false);
         void openDocument();
+        void openEnvironmentMap();
         void updateTitle();
     };
 

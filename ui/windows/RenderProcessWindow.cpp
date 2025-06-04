@@ -134,16 +134,6 @@ namespace hs {
                     profile.setSelectedEnvMap(i);
                 }
             }
-
-            if (ImGui::Button("Load Environment Map"))
-            {
-                if (auto result = context.getIO().getDialogsFacade().openFile(
-                    "Open HDR environment map", ".", {{ "HDR", "*.hdr"}}
-                    ))
-                {
-                    renderer.loadEnvMap(result.value());
-                }
-            }
         }
         if (ImGui::CollapsingHeader("Other", ImGuiTreeNodeFlags_DefaultOpen)) {
             bool antialiasing = profile.isAntialiasing();

@@ -80,7 +80,8 @@ namespace hs {
     void Mesh::render(RenderContext& renderContext) {
         if (
             renderContext.getRenderMode() != RenderMode::Surfaces &&
-            renderContext.getRenderMode() != RenderMode::SurfaceSelectColor
+            renderContext.getRenderMode() != RenderMode::SurfaceSelectColor &&
+            renderContext.getRenderMode() != RenderMode::SurfaceWithoutMaterial
         )
             return;
         drawTriangles();

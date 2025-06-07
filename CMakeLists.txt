@@ -333,6 +333,8 @@ add_executable(heterogeneous_solids
         scene/ibl/Data.h
         scene/ibl/BuilderImp.cpp
         scene/ibl/BuilderImp.h
+        scene/ShadowMap.cpp
+        scene/ShadowMap.h
 )
 
 target_compile_definitions(heterogeneous_solids PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)

@@ -39,7 +39,8 @@ namespace hs {
         usePbr(false),
         showSkybox(false),
         useIbl(false),
-        selectedEnvMap(0)
+        selectedEnvMap(0),
+        useShadows(false)
     {
         // TODO: Put back default parameters that have been changed
     }
@@ -250,5 +251,15 @@ namespace hs {
     void RenderProfile::setSelectedEnvMap(const unsigned int index)
     {
         this->selectedEnvMap = index;
+    }
+
+    bool RenderProfile::isUseShadows() const
+    {
+        return useShadows;
+    }
+
+    void RenderProfile::setUseShadows(bool useShadows)
+    {
+        this->useShadows = useShadows;
     }
 } // hs

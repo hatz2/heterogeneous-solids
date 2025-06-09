@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 project(heterogeneous_solids)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/portable-file-dialogs)
 
@@ -333,8 +335,8 @@ add_executable(heterogeneous_solids
         scene/ibl/Data.h
         scene/ibl/BuilderImp.cpp
         scene/ibl/BuilderImp.h
-        scene/ShadowMap.cpp
-        scene/ShadowMap.h
+        scene/lights/ShadowMap.cpp
+        scene/lights/ShadowMap.h
 )
 
 target_compile_definitions(heterogeneous_solids PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)

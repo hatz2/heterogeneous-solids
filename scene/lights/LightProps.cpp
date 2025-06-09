@@ -6,13 +6,13 @@
 #include "LightProps.h"
 
 namespace hs {
-    LightProps::LightProps() : iA(1), iD(1), iS(1), position(0), lookAt(0), gamma(glm::pi<float>()/3) {
+    LightProps::LightProps() : iA(1), iD(1), iS(1), position(0), lookAt(0), gamma(glm::pi<float>()/3), shadow(false) {
 
     }
 
     LightProps::LightProps(
-        glm::vec3 iA, glm::vec3 iD, glm::vec3 iS, glm::vec3 position, glm::vec3 lookAt, float gamma
-    ) : iA(iA), iD(iD), iS(iS), position(position), lookAt(lookAt), gamma(gamma) {
+        glm::vec3 iA, glm::vec3 iD, glm::vec3 iS, glm::vec3 position, glm::vec3 lookAt, float gamma, bool shadow
+    ) : iA(iA), iD(iD), iS(iS), position(position), lookAt(lookAt), gamma(gamma), shadow(shadow) {
 
     }
 
@@ -62,5 +62,15 @@ namespace hs {
 
     void LightProps::setGamma(float gamma) {
         LightProps::gamma = gamma;
+    }
+
+    bool LightProps::isShadow() const
+    {
+        return shadow;
+    }
+
+    void LightProps::setShadow(bool shadow)
+    {
+        this->shadow = shadow;
     }
 } // hs

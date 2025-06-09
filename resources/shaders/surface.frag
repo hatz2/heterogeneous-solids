@@ -2,6 +2,9 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
+const int max_lights = 8;
+
+in vec4 lightSpacePositions[max_lights];
 in vec3 position;
 in vec3 normal;
 in vec3 uvw;

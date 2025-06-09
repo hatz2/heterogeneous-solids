@@ -17,11 +17,13 @@ namespace hs {
         glm::vec3 position;
         glm::vec3 lookAt;
         float gamma;
+        bool shadow;
     public:
         LightProps();
         LightProps(
             glm::vec3 iA, glm::vec3 iD, glm::vec3 iS,
-            glm::vec3 position, glm::vec3 lookAt, float gamma
+            glm::vec3 position, glm::vec3 lookAt, float gamma,
+            bool shadow
         );
         LightProps(const LightProps&) = default;
         LightProps& operator=(const LightProps&) = default;
@@ -43,6 +45,9 @@ namespace hs {
 
         [[nodiscard]] float getGamma() const;
         void setGamma(float gamma);
+
+        [[nodiscard]] bool isShadow() const;
+        void setShadow(bool shadow);
     };
 
 } // hs

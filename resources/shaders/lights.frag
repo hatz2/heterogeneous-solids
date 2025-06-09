@@ -1,5 +1,3 @@
-const int max_lights = 32;
-
 // "Enums" for light type
 const int ambient_light = 0;
 const int point_light = 1;
@@ -20,8 +18,10 @@ uniform struct Light {
     vec3 position;
     vec3 direction;
     float spotAngle;
+    bool shadow;
 } lights[max_lights];
 
+uniform sampler2D shadowMaps[max_lights];
 
 
 vec3 defaultAmbientLight(Material material, Light light);
@@ -32,6 +32,18 @@ vec3 iblAmbientLight(Material material);
 
 vec3 pbrLighting(Material material);
 vec3 defaultLighting(Material material);
+
+float isPointInShadow(vec4 fragPosLightSpace, sampler2D shadowMap) {
+    // perspective division
+    vec3 projectionCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // to [0, 1] range
+    projectionCoords = projectionCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMap, projectionCoords.xy).r;
+    float currentDepth = projectionCoords.z;
+
+    return currentDepth < closestDepth ? 1.0 : 0.0;
+}
 
 
 vec3 toLinear(vec3 color) {
@@ -62,8 +74,15 @@ vec3 defaultLighting(Material material) {
         if (light.type == ambient_light)
             result += defaultAmbientLight(material, light);
 
-        else if (light.type == directional_light)
-            result += defaultDirectionalLight(material, light);
+        else if (light.type == directional_light) {
+            float isInShadow = 1.0;
+
+            if (light.shadow) {
+                isInShadow = isPointInShadow(lightSpacePositions[i], shadowMaps[i]);
+            }
+
+            result += defaultDirectionalLight(material, light) * isInShadow;
+        }
 
         else if (light.type == spot_light)
             result += defaultSpotLight(material, light);

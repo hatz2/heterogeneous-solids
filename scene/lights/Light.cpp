@@ -6,13 +6,14 @@
 
 #include <sstream>
 #include <utility>
+#include "ShadowMap.h"
 
 namespace hs {
     Light::Light(
         std::string name, LightType lightType, glm::vec3 iA, glm::vec3 iD, glm::vec3 iS,
-        glm::vec3 position, glm::vec3 lookAt, float gamma
+        glm::vec3 position, glm::vec3 lookAt, float gamma, bool shadow
     ) :
-        name(std::move(name)), lightType(lightType), lightProps(iA, iD, iS, position, lookAt, gamma), enabled(true)
+        name(std::move(name)), lightType(lightType), lightProps(iA, iD, iS, position, lookAt, gamma, shadow), enabled(true)
     {
 
     }
@@ -58,6 +59,11 @@ namespace hs {
         return lightProps;
     }
 
+    const ShadowMap& Light::getShadowMap() const
+    {
+        return shadowMap;
+    }
+
     void Light::apply(RenderContext& renderContext, const unsigned int index) {
         std::stringstream typeProperty;
         typeProperty << "lights[" << index << "].type";
@@ -92,6 +98,30 @@ namespace hs {
         spotAngleProperty << "lights[" << index << "].spotAngle";
         renderContext.getUniform(spotAngleProperty.str()).set(lightProps.getGamma());
 
+        std::stringstream shadowProperty;
+        shadowProperty << "lights[" << index << "].shadow";
+        renderContext.getUniform(shadowProperty.str()).set(getLightProps().isShadow());
+
+        std::stringstream shadowMapProperty;
+        shadowMapProperty << "shadowMaps[" << index << "]";
+        glActiveTexture(GL_TEXTURE3 + index);
+        glBindTexture(GL_TEXTURE_2D, shadowMap.getId());
+        renderContext.getUniform(shadowMapProperty.str()).set(3 + index);
+
+
+        // for (int i = 0; i < 8; ++i)
+        // {
+        //     std::stringstream shadowMapProperty;
+        //     shadowMapProperty << "shadowMaps[" << i << "]";
+        //     glActiveTexture(GL_TEXTURE3 + index);
+        //     glBindTexture(GL_TEXTURE_2D, shadowMap.getId());
+        //     renderContext.getUniform(shadowMapProperty.str()).set(3 + i);
+        // }
+
+
+        std::stringstream lightSpaceMatrixProperty;
+        lightSpaceMatrixProperty << "lightSpaceMatrices[" << index << "]";
+        renderContext.getUniform(lightSpaceMatrixProperty.str()).set(getLightSpaceMatrix());
 
 
         // switch (lightType) {
@@ -128,5 +158,23 @@ namespace hs {
         //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "spotLight");
         //         break;
         // }
+    }
+
+    void Light::renderToShadowMap(const Scene& scene, ShaderManager& shaderManager)
+    {
+        shadowMap.render(scene, shaderManager, *this);
+    }
+
+    glm::mat4 Light::getLightSpaceMatrix() const
+    {
+        float nearPlane = 0.01f, farPlane = 150.0f;
+        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+        glm::mat4 lightView = glm::lookAt(
+            lightProps.getPosition(),
+            lightProps.getLookAt(),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+        return lightProjection * lightView;
     }
 } // hs

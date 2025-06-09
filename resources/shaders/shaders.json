@@ -34,5 +34,11 @@
   ],
   "brdf_lut": [
     "brdf_lut.vert", "brdf_lut.frag", "ibl_equations.frag"
+  ],
+  "shadow_map": [
+    "shadow_map.vert", "shadow_map.frag"
+  ],
+  "quad": [
+    "quad.vert", "quad.frag"
   ]
 }

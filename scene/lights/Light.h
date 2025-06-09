@@ -9,6 +9,8 @@
 #include <glm/glm.hpp>
 #include "../RenderContext.h"
 #include "LightProps.h"
+#include "ShadowMap.h"
+#include "../../shaders/ShaderManager.h"
 
 namespace hs {
 
@@ -25,10 +27,11 @@ namespace hs {
         LightType lightType;
         LightProps lightProps;
         bool enabled;
+        ShadowMap shadowMap;
     public:
         Light(
             std::string name, LightType lightType, glm::vec3 iA, glm::vec3 iD, glm::vec3 iS,
-            glm::vec3 position, glm::vec3 lookAt, float gamma
+            glm::vec3 position, glm::vec3 lookAt, float gamma, bool shadow
         );
         Light(std::string name, LightType lightType);
         Light();
@@ -46,7 +49,14 @@ namespace hs {
         void setLightProps(LightProps lightData);
         LightProps& getLightProps();
 
+        [[nodiscard]] const ShadowMap& getShadowMap() const;
+
         void apply(RenderContext& renderContext, unsigned int index);
+
+        void renderToShadowMap(const Scene& scene, ShaderManager& shaderManager);
+
+
+        glm::mat4 getLightSpaceMatrix() const;
     };
 
 } // hs

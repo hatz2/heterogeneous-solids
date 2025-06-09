@@ -12,6 +12,7 @@
 #include "../shaders/ShaderManager.h"
 #include "gizmos/Grid.h"
 #include "RenderProfile.h"
+#include "lights/ShadowMap.h"
 #include "ibl/Builder.h"
 
 namespace hs {
@@ -25,6 +26,7 @@ namespace hs {
 
         [[nodiscard]] const std::vector<ibl::Data>& getEnvMaps() const;
         void loadEnvMap(const std::string& path);
+
     private:
         // GIZMOS
         Grid grid;
@@ -39,6 +41,7 @@ namespace hs {
         void renderObjects(const RenderProfile& profile, const Scene& scene);
         void renderGizmos(const RenderProfile& profile, const Scene& scene);
         void renderSkybox(const RenderProfile& profile, const Scene& scene);
+        void renderShadowMaps(const RenderProfile& profile, const Scene& scene);
 
         void renderSurfaces(const RenderProfile& profile, const Scene& scene);
         void renderLines(const RenderProfile& profile, const Scene& scene, bool selection = false);

@@ -7,20 +7,17 @@
 
 #include <GL/glew.h>
 
-#include "Scene.h"
-#include "../shaders/ShaderManager.h"
-
 namespace hs {
 
 class ShadowMap {
 public:
-    ShadowMap(const int width = 1024, const int height = 1024);
-    ~ShadowMap();
+    ShadowMap(const int width = 2048, const int height = 2048);
+
     [[nodiscard]] GLuint getId() const { return id; }
     [[nodiscard]] int getWidth() const { return width; }
     [[nodiscard]] int getHeight() const { return height; }
 
-    void render(const Scene& scene, ShaderManager& shaderManager, Light& light);
+    void render(const class Scene& scene, class ShaderManager& shaderManager, class Light& light) const;
 
 private:
     GLuint createEmptyTexture2D(const int width, const int height);

@@ -114,6 +114,12 @@ namespace hs {
         float gamma = lightProps.getGamma();
         if (ImGui::SliderAngle("Gamma", &gamma, 0, 90))
             lightProps.setGamma(gamma);
+
+        auto shadow = lightProps.isShadow();
+        if (ImGui::Checkbox("Shadow", &shadow))
+        {
+            lightProps.setShadow(shadow);
+        }
     }
 
     void LightsWindow::positionalLightProps(LightProps& lightProps) {

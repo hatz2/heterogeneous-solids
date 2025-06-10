@@ -108,56 +108,9 @@ namespace hs {
         glBindTexture(GL_TEXTURE_2D, shadowMap.getId());
         renderContext.getUniform(shadowMapProperty.str()).set(3 + index);
 
-
-        // for (int i = 0; i < 8; ++i)
-        // {
-        //     std::stringstream shadowMapProperty;
-        //     shadowMapProperty << "shadowMaps[" << i << "]";
-        //     glActiveTexture(GL_TEXTURE3 + index);
-        //     glBindTexture(GL_TEXTURE_2D, shadowMap.getId());
-        //     renderContext.getUniform(shadowMapProperty.str()).set(3 + i);
-        // }
-
-
         std::stringstream lightSpaceMatrixProperty;
         lightSpaceMatrixProperty << "lightSpaceMatrices[" << index << "]";
         renderContext.getUniform(lightSpaceMatrixProperty.str()).set(getLightSpaceMatrix());
-
-
-        // switch (lightType) {
-        //     case LightType::Ambient:
-        //         renderContext.getUniform("light[.iA").set(lightProps.getIA());
-        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "ambientLight");
-        //         break;
-        //     case LightType::Point:
-        //         renderContext.getUniform("light.position").set(
-        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
-        //         );
-        //         renderContext.getUniform("light.iD").set(lightProps.getID());
-        //         renderContext.getUniform("light.iS").set(lightProps.getIS());
-        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "pointLight");
-        //         break;
-        //     case LightType::Directional:
-        //         renderContext.getUniform("light.direction").set(
-        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
-        //         );
-        //         renderContext.getUniform("light.iD").set(lightProps.getID());
-        //         renderContext.getUniform("light.iS").set(lightProps.getIS());
-        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "directionalLight");
-        //         break;
-        //     case LightType::SpotLight:
-        //         renderContext.getUniform("light.direction").set(
-        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getLookAt() - lightProps.getPosition(), 0))
-        //         );
-        //         renderContext.getUniform("light.position").set(
-        //             (glm::vec3)(renderContext.getViewMatrix() * glm::vec4(lightProps.getPosition(), 1))
-        //         );
-        //         renderContext.getUniform("light.iD").set(lightProps.getID());
-        //         renderContext.getUniform("light.iS").set(lightProps.getIS());
-        //         renderContext.getUniform("light.spotAngle").set(lightProps.getGamma());
-        //         renderContext.getFragmentSubroutines().setSubroutine("lightMethod", "spotLight");
-        //         break;
-        // }
     }
 
     void Light::renderToShadowMap(const Scene& scene, ShaderManager& shaderManager)
@@ -169,10 +122,20 @@ namespace hs {
     {
         float nearPlane = 0.01f, farPlane = 150.0f;
         glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+
+
+        glm::vec3 lightDir = glm::normalize(lightProps.getLookAt() - lightProps.getPosition());
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        if (fabs(glm::dot(lightDir, up)) > 0.995f)
+        {
+            up = glm::vec3(0.0f, 0.0f, 1.0f);
+        }
+
         glm::mat4 lightView = glm::lookAt(
             lightProps.getPosition(),
             lightProps.getLookAt(),
-            glm::vec3(0.0f, 1.0f, 0.0f)
+            up
         );
 
         return lightProjection * lightView;

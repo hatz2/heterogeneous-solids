@@ -226,7 +226,6 @@ namespace hs {
     {
         auto lights = scene.getLights().getCompiledLights();
 
-
         for (auto& light : lights)
         {
             if (light.get().getLightType() == LightType::Directional && light.get().getLightProps().isShadow())
@@ -234,16 +233,6 @@ namespace hs {
                 light.get().renderToShadowMap(scene, shaderManager);
             }
         }
-
-        // for (size_t i = 0; i < lights.size(); ++i)
-        // {
-        //     Light& light = lights[i];
-        //     if (lights[i].get().getLightType() == LightType::Directional)
-        //     {
-        //
-        //         //shadowMap.render(scene, shaderManager, lights[i]);
-        //     }
-        // }
     }
 
     void Renderer::renderSurfaces(const RenderProfile& profile, const Scene &scene) {

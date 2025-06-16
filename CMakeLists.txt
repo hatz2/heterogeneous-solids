@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 project(heterogeneous_solids)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/portable-file-dialogs)

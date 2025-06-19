@@ -6,16 +6,16 @@
 
 namespace hs {
     RenderProfile::RenderProfile():
-        backgroundColor(0.2),
+        backgroundColor(1),
 
         showSurfaces(true),
         detailedSurfaces(true),
 
-        showMainLines(false),
+        showMainLines(true),
         mainLinesColor(0, 0, 0, 0.2),
         mainLinesThickness(4),
 
-        showDetailedLines(false),
+        showDetailedLines(true),
         detailedLinesColor(0, 0, 0, 0.2),
         detailedLinesThickness(2),
 
@@ -23,7 +23,7 @@ namespace hs {
         normalFieldColor(0.3, 0.3, 0.3, 0.4),
         normalFieldThickness(1),
 
-        showVertices(false),
+        showVertices(true),
         vertexColor(0, 0, 1, 0.7),
         vertexRadius(1),
 
@@ -31,7 +31,7 @@ namespace hs {
         selectionTint(0, 1, 0, 1),
         selectionDrawDepth(false),
 
-        showGridGizmo(false),
+        showGridGizmo(true),
         showLightsGizmo(false),
 
         antialiasing(true),

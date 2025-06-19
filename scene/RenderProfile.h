@@ -45,8 +45,6 @@ namespace hs {
         bool showSkybox;
         bool useIbl;
         unsigned int selectedEnvMap;
-
-        bool useShadows;
     public:
         RenderProfile();
 
@@ -124,9 +122,6 @@ namespace hs {
 
         [[nodiscard]] unsigned int getSelectedEnvMap() const;
         void setSelectedEnvMap(const unsigned int index);
-
-        [[nodiscard]] bool isUseShadows() const;
-        void setUseShadows(bool useShadows);
     };
 
 } // hs

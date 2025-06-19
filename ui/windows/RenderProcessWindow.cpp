@@ -109,12 +109,6 @@ namespace hs {
                 profile.setUsePbr(usePbr);
             }
 
-            // TEST
-            bool useShadows = profile.isUseShadows();
-            if (ImGui::Checkbox("Render shadowmap", &useShadows)) {
-                profile.setUseShadows(useShadows);
-            }
-
             ImGui::SeparatorText("Image Based Lighting");
 
             bool useIbl = profile.isUseIbl();

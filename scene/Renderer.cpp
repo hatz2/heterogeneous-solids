@@ -240,98 +240,50 @@ namespace hs {
 
         renderShadowMaps(profile, scene);
 
-        if (profile.isUseShadows())
+        RenderContext renderContext(*shaderManager.requireShaderProgram("surface"));
+        renderContext.setSelection(&scene.getSelectedObject());
+        renderContext.setViewMatrix(scene.getCamera().view());
+        renderContext.setProjectionMatrix(scene.getCamera().projection());
+
+        renderContext.setRenderMode(RenderMode::Surfaces);
+        renderContext.setDetailedRendering(profile.isDetailedSurfaces());
+        renderContext.getUniform("usePbr").set(profile.isUsePbr());
+        renderContext.getUniform("useIbl").set(profile.isUseIbl());
+        renderContext.getUniform("irradianceMap").set(0);
+        renderContext.getUniform("prefilteredMap").set(1);
+        renderContext.getUniform("brdfLUT").set(2);
+
+        // shadow map texture units
+        for (int i = 0; i < 8; ++i)
         {
-            auto lights = scene.getLights().getCompiledLights();
-
-            for (auto& light : lights)
-            {
-                if (light.get().getLightType() == LightType::Directional && light.get().getLightProps().isShadow())
-                {
-                    RenderContext renderContext(*shaderManager.requireShaderProgram("quad"));
-                    renderContext.getUniform("depthMap").set(0);
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, light.get().getShadowMap().getId());
-
-                    // render quad
-                    std::vector<glm::vec3> vertices = {
-                        {-1.0f,  1.0f, 0.0f}, // 0
-                        {-1.0f, -1.0f, 0.0f}, // 1
-                        { 1.0f,  1.0f, 0.0f}, // 2
-                        { 1.0f, -1.0f,  1.0f}, // 3
-                    };
-
-                    std::vector<unsigned int> indices = {
-                        0, 1, 2,
-                        1, 2, 3,
-                    };
-
-                    std::vector<glm::vec3> texCoords = {
-                        {0.0f, 1.0f, 0.0f},
-                        {0.0f, 0.0f, 0.0f},
-                        {1.0f, 1.0f, 0.0f},
-                        {1.0f, 0.0f, 0.0f}
-                    };
-
-                    Mesh quad;
-                    quad.setVertices(vertices);
-                    quad.setIndices(indices);
-                    quad.setUVW(texCoords);
-
-                    glDisable(GL_CULL_FACE);
-                    quad.render(renderContext);;
-                }
-            }
-
-
+            std::stringstream shadowMapProperty;
+            shadowMapProperty << "shadowMaps[" << i << "]";
+            renderContext.getUniform(shadowMapProperty.str()).set(3 + i);
         }
-        else
+
+        if (!envMaps.empty())
         {
-            RenderContext renderContext(*shaderManager.requireShaderProgram("surface"));
-            renderContext.setSelection(&scene.getSelectedObject());
-            renderContext.setViewMatrix(scene.getCamera().view());
-            renderContext.setProjectionMatrix(scene.getCamera().projection());
-
-            renderContext.setRenderMode(RenderMode::Surfaces);
-            renderContext.setDetailedRendering(profile.isDetailedSurfaces());
-            renderContext.getUniform("usePbr").set(profile.isUsePbr());
-            renderContext.getUniform("useIbl").set(profile.isUseIbl());
-            renderContext.getUniform("irradianceMap").set(0);
-            renderContext.getUniform("prefilteredMap").set(1);
-            renderContext.getUniform("brdfLUT").set(2);
-
-            // shadow map texture units
-            for (int i = 0; i < 8; ++i)
-            {
-                std::stringstream shadowMapProperty;
-                shadowMapProperty << "shadowMaps[" << i << "]";
-                renderContext.getUniform(shadowMapProperty.str()).set(3 + i);
-            }
-
-            if (!envMaps.empty())
-            {
-                auto data = envMaps[profile.getSelectedEnvMap()];
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_CUBE_MAP, data.irradianceMap);
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_CUBE_MAP, data.prefilteredMap);
-                glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, data.brdfLUT);
-            }
-
-
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            auto lights = scene.getLights().getCompiledLights();
-
-            renderContext.getUniform("numLights").set(static_cast<unsigned int>(lights.size()));
-
-            for (size_t i = 0; i < lights.size(); ++i)
-            {
-                lights[i].get().apply(renderContext, i);
-            }
-
-            scene.getRoot().getRenderer()(renderContext);
+            auto data = envMaps[profile.getSelectedEnvMap()];
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, data.irradianceMap);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, data.prefilteredMap);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, data.brdfLUT);
         }
+
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        auto lights = scene.getLights().getCompiledLights();
+
+        renderContext.getUniform("numLights").set(static_cast<unsigned int>(lights.size()));
+
+        for (size_t i = 0; i < lights.size(); ++i)
+        {
+            lights[i].get().apply(renderContext, i);
+        }
+
+        scene.getRoot().getRenderer()(renderContext);
     }
 
     void Renderer::renderLines(const RenderProfile& profile, const Scene& scene, bool selection) {

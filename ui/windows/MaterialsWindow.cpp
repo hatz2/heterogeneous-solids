@@ -179,8 +179,10 @@ namespace hs {
         const RenderProfile& profile = context.getRenderProfile();
 
         glm::vec3 ka = material.getKA();
+        ImGui::BeginDisabled(profile.isUseIbl());
         if (ImGui::ColorEdit3("Ambient Color", glm::value_ptr(ka)))
             material.setKA(ka);
+        ImGui::EndDisabled();
 
         glm::vec3 kd = material.getKD();
         if (ImGui::ColorEdit3("Diffuse Color", glm::value_ptr(kd)))

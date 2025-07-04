@@ -81,6 +81,8 @@ Material selectContinuousMaterial() {
     material.kD = mix(materials[0].kD, materials[1].kD, materialCoef.a0);
     material.kS = mix(materials[0].kS, materials[1].kS, materialCoef.a0);
     material.shininess = mix(materials[0].shininess, materials[1].shininess, materialCoef.a0);
+    material.metallic = mix(materials[0].metallic, materials[1].metallic, materialCoef.a0);
+    material.roughness = mix(materials[0].roughness, materials[1].roughness, materialCoef.a0);
     return material;
 }
 

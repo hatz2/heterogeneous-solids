@@ -1,5 +1,3 @@
-const int max_lights = 32;
-
 // "Enums" for light type
 const int ambient_light = 0;
 const int point_light = 1;
@@ -20,8 +18,10 @@ uniform struct Light {
     vec3 position;
     vec3 direction;
     float spotAngle;
+    bool shadow;
 } lights[max_lights];
 
+uniform sampler2D shadowMaps[max_lights];
 
 
 vec3 defaultAmbientLight(Material material, Light light);
@@ -32,6 +32,36 @@ vec3 iblAmbientLight(Material material);
 
 vec3 pbrLighting(Material material);
 vec3 defaultLighting(Material material);
+
+float isPointInShadow(vec4 fragPosLightSpace, sampler2D shadowMap, Light light) {
+    vec3 normal = normalize(normal);
+    vec3 lightDir = normalize(-light.direction);
+    // perspective division
+    vec3 projectionCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // to [0, 1] range
+    projectionCoords = projectionCoords * 0.5 + 0.5;
+
+    if (projectionCoords.z > 1.0) {
+        return 0.0;
+    }
+
+    float closestDepth = texture(shadowMap, projectionCoords.xy).r;
+    float currentDepth = projectionCoords.z;
+
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -2; x <= 2; ++x) {
+        for(int y = -2; y <= 2; ++y) {
+            float pcfDepth = texture(shadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 25.0;
+
+    return shadow;
+}
 
 
 vec3 toLinear(vec3 color) {
@@ -62,8 +92,15 @@ vec3 defaultLighting(Material material) {
         if (light.type == ambient_light)
             result += defaultAmbientLight(material, light);
 
-        else if (light.type == directional_light)
-            result += defaultDirectionalLight(material, light);
+        else if (light.type == directional_light) {
+            float isInShadow = 0.0;
+
+            if (light.shadow) {
+                isInShadow = isPointInShadow(lightSpacePositions[i], shadowMaps[i], light);
+            }
+
+            result += defaultDirectionalLight(material, light) * (1.0 - isInShadow);
+        }
 
         else if (light.type == spot_light)
             result += defaultSpotLight(material, light);

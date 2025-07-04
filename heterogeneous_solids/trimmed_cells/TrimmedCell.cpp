@@ -250,6 +250,7 @@ namespace hs {
             case RenderMode::SurfaceSelectColor:
                 renderContext.getSelectionController().subscribeNextObject(*this);
             case RenderMode::Normals:
+            case RenderMode::SurfaceWithoutMaterial:
             case RenderMode::Surfaces:
                 if (renderContext.IsDetailedRendering() && subTrimmedCellsCount) {
                     for (int i = 0; i < subTrimmedCellsCount; i++) subTrimmedCells[i]->getRenderer()(renderContext);

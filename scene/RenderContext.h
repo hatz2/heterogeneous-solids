@@ -20,7 +20,8 @@ namespace hs {
         Surfaces,
         Vertices,
         SurfaceSelectColor,
-        VertexSelectColor
+        VertexSelectColor,
+        SurfaceWithoutMaterial
     };
 
     class RenderContext {

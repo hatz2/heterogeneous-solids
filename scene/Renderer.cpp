@@ -8,6 +8,7 @@
 
 #include <iostream>
 
+#include "lights/ShadowMap.h"
 #include "ibl/BuilderImp.h"
 
 namespace hs {
@@ -67,6 +68,8 @@ namespace hs {
     }
 
     void Renderer::render(const RenderProfile& profile, const Scene& scene) {
+        //renderShadowMaps(profile, scene);
+
         auto& backgroundColor = profile.getBackgroundColor();
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -219,8 +222,23 @@ namespace hs {
         glDepthMask(depthMask);
     }
 
+    void Renderer::renderShadowMaps(const RenderProfile& profile, const Scene& scene)
+    {
+        auto lights = scene.getLights().getCompiledLights();
+
+        for (auto& light : lights)
+        {
+            if (light.get().getLightType() == LightType::Directional && light.get().getLightProps().isShadow())
+            {
+                light.get().renderToShadowMap(scene, shaderManager);
+            }
+        }
+    }
+
     void Renderer::renderSurfaces(const RenderProfile& profile, const Scene &scene) {
         if (!profile.isShowSurfaces()) return;
+
+        renderShadowMaps(profile, scene);
 
         RenderContext renderContext(*shaderManager.requireShaderProgram("surface"));
         renderContext.setSelection(&scene.getSelectedObject());
@@ -234,6 +252,14 @@ namespace hs {
         renderContext.getUniform("irradianceMap").set(0);
         renderContext.getUniform("prefilteredMap").set(1);
         renderContext.getUniform("brdfLUT").set(2);
+
+        // shadow map texture units
+        for (int i = 0; i < 8; ++i)
+        {
+            std::stringstream shadowMapProperty;
+            shadowMapProperty << "shadowMaps[" << i << "]";
+            renderContext.getUniform(shadowMapProperty.str()).set(3 + i);
+        }
 
         if (!envMaps.empty())
         {

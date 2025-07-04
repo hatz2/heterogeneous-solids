@@ -15,8 +15,15 @@ vec3 pbrLighting(Material material) {
     for (uint i = 0; i < numLights; ++i) {
         Light light = lights[i];
 
-        if (light.type == directional_light)
-            result += pbrDirectionalLight(material, light);
+        if (light.type == directional_light) {
+            float isInShadow = 0.0;
+
+            if (light.shadow) {
+                isInShadow = isPointInShadow(lightSpacePositions[i], shadowMaps[i], light);
+            }
+            
+            result += pbrDirectionalLight(material, light) * (1.0 - isInShadow);
+        }
 
         else if (light.type == spot_light)
             result += pbrSpotLight(material, light);

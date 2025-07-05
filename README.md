@@ -7,32 +7,13 @@ This repository contains the source code of my Master's Thesis. The goal of the 
 
 ### Results
 
-<p align="center">
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-metodos-inicial.png" alt="Original lighting" width="200"/>
-    <figcaption>Original lighting</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-metodos-ibl.png" alt="PBR and IBL lighting" width="200"/>
-    <figcaption>PBR + IBL</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-metodos-shadows-1.png" alt="PBR, IBL, Skybox and Shadow lighting" width="200"/>
-    <figcaption>PBR + IBL + Skybox + Shadow</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-material-continuo.png" alt="Continuous material" width="200"/>
-    <figcaption>Continuous material</figcaption>
-  </figure>
-    <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-material-perlin.png" alt="Functionally graded material" width="200"/>
-    <figcaption>Functionally graded material</figcaption>
-  </figure>
-    <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-material-composite.png" alt="Composite material" width="200"/>
-    <figcaption>Composite material</figcaption>
-  </figure>
-</p>
+| ![Original lighting](images/prueba-metodos-inicial.png) | ![PBR + IBL](images/prueba-metodos-ibl.png) | ![PBR + IBL + Skybox + Shadow](images/prueba-metodos-shadows-1.png) |
+|:--:|:--:|:--:|
+| Original lighting | PBR + IBL | PBR + IBL + Skybox + Shadow |
+
+| ![Continuous material](images/prueba-material-continuo.png) | ![Functionally graded material](images/prueba-material-perlin.png) | ![Composite material](images/prueba-material-composite.png) |
+|:--:|:--:|:--:|
+| Continuous material | Functionally graded material | Composite material |
 
 ### Compilation
 
@@ -93,32 +74,13 @@ Este repositorio contiene el código fuente de mi Trabajo de Fin de Máster. El 
 
 ### Resultados
 
-<p align="center">
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-metodos-inicial.png" alt="Iluminación original" width="200"/>
-    <figcaption>Iluminación original</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-metodos-ibl.png" alt="Iluminación PBR e IBL" width="200"/>
-    <figcaption>PBR + IBL</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-metodos-shadows-1.png" alt="Iluminación con PBR, IBL, Skybox y Sombra" width="200"/>
-    <figcaption>PBR + IBL + Skybox + Sombra</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-material-continuo.png" alt="Material continuo" width="200"/>
-    <figcaption>Material continuo</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-material-perlin.png" alt="Material funcionalmente graduado" width="200"/>
-    <figcaption>Material funcionalmente graduado</figcaption>
-  </figure>
-  <figure style="display:inline-block; text-align: center; margin: 10px;">
-    <img src="images/prueba-material-composite.png" alt="Material compuesto" width="200"/>
-    <figcaption>Material compuesto</figcaption>
-  </figure>
-</p>
+| ![Iluminación original](images/prueba-metodos-inicial.png) | ![PBR + IBL](images/prueba-metodos-ibl.png) | ![PBR + IBL + Skybox + Shadow](images/prueba-metodos-shadows-1.png) |
+|:--:|:--:|:--:|
+| Iluminación original | PBR + IBL | PBR + IBL + Skybox + Sombras |
+
+| ![Continuous material](images/prueba-material-continuo.png) | ![Functionally graded material](images/prueba-material-perlin.png) | ![Composite material](images/prueba-material-composite.png) |
+|:--:|:--:|:--:|
+| Material continuo | Material funcionalmente graduado | Material compeusto |
 
 
 

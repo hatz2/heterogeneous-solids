@@ -67,6 +67,14 @@ To build the project on Linux, follow these steps:
 
 #### Windows
 
+For Windows, I haven't found a simple way to compile the project from the terminal. Therefore, it is recommended to use [CLion](https://www.jetbrains.com/clion/) to build the project. To do so, follow these steps:
+
+1. Open the project in CLion.  
+2. Go to `File -> Settings -> Plugins` and install the Conan plugin.  
+3. In the bottom-left corner of the window, click on the Conan icon and then click the gear icon to configure the dependencies.  
+4. Go to `File -> Build -> Build Project` to build the project.  
+
+
 
 ## Español
 
@@ -135,3 +143,10 @@ Para compilar el proyecto en Linux, sigue estos pasos:
     ```
 
 #### Windows
+
+Para Windows no he encontrado una forma de compilar el proyecto de forma sencilla desde la terminal. Por lo tanto, se recomienda utilizar [Clion](https://www.jetbrains.com/clion/) para compilar el proyecto. Para ello, sigue estos pasos:
+
+1. Abre el proyecto en Clion.
+2. Ve a `File -> Settings -> Plugis` e instala el plugin de conan.
+3. En parte inferior izquierda de la ventana, haz clic en el icono de conan y pulsa sobre la rueda dentada para configurar las dependencias.
+4. Ve a `File -> Build -> Build Project` para compilar el proyecto.
